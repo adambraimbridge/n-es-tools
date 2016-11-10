@@ -1,11 +1,13 @@
 # Next Elasticsearch Tools
 
+A useful CLI for working with Next's Elasticsearch clusters. Includes tools to snapshot and restore indexes.
+
 ## Installation and setup
 
 This tool requires **Node 6** or above.
 
 ```
-$ npm i -g next-es-tools
+$ npm i -g @financial-times/next-es-tools
 ```
 
 Next you'll need to create a workspace, to do so run:
