@@ -2,26 +2,30 @@
 
 const fs = require('fs')
 const path = require('path')
-const args = require('minimist')(process.argv.slice(2))
+const dotenv = require('dotenv')
+const program = require('commander')
 
+// try to load the .env from the current directory
 const env = path.join(process.cwd(), '.env')
 
 if (fs.existsSync(env)) {
-  require('dotenv').config({ path: env })
+  dotenv.config({ path: env })
+} else {
+  console.warn(
+    '\x1b[31m\n',
+    'No .env configuration found, please run the workspace command',
+    '\x1b[0m\n'
+  )
 }
 
-const tools = require('../lib')
+// register all tools
+const tools = {
+  workspace: require('../lib/tasks/workspace')(program),
+  uuids: require('../lib/tasks/uuids')(program)
+}
 
-if (tools[args._]) {
-  const res = tools[args._](args)
+const argv = program.parse(process.argv)
 
-  if (res instanceof Promise) {
-    res.catch((err) => {
-      console.error(err.message)
-      process.exit()
-    })
-  }
-} else {
-  console.error(`No task named "${args._}"`)
-  console.error(`Valid tasks are: ${Object.keys(tools)}`)
+if (argv.args.length === 0) {
+  program.help()
 }
