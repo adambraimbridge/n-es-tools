@@ -21,6 +21,7 @@ if (fs.existsSync(env)) {
 // register all tools
 const tools = {
   repository: require('../tools/repository')(program),
+  snapshot: require('../tools/snapshot')(program),
   uuids: require('../tools/uuids')(program),
   workspace: require('../tools/workspace')(program)
 }
