@@ -20,8 +20,8 @@ if (fs.existsSync(env)) {
 
 // register all tools
 const tools = {
-  workspace: require('../lib/tasks/workspace')(program),
-  uuids: require('../lib/tasks/uuids')(program)
+  workspace: require('../tools/workspace')(program),
+  uuids: require('../tools/uuids')(program)
 }
 
 const argv = program.parse(process.argv)

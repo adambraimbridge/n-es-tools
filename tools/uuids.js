@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
-const elastic = require('../elastic')
-const progress = require('../progress')
+const elastic = require('../lib/elastic')
+const progress = require('../lib/progress')
 
 const INDEX = 'v3_api_v2'
 const TYPE = 'item'
