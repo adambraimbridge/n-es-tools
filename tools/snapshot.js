@@ -30,10 +30,12 @@ function pingSnapshot ({ repository, name }) {
     repository
   })
     .then((response) => {
-      const { state, shards_stats } = response.snapshots.find((item) => item.snapshot === name)
+      const { state, stats } = response.snapshots.find((item) => item.snapshot === name)
 
-      status.total = shards_stats.total
-      status.tick(shards_stats.done)
+      status.total = stats.number_of_files
+      status.curr = stats.processed_files
+
+      status.tick()
 
       if (state === 'SUCCESS' || state === 'DONE') {
         return
