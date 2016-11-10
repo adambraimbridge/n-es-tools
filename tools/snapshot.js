@@ -2,8 +2,6 @@ const progress = require('../lib/progress')
 const elastic = require('../lib/elastic')
 const wait = require('../lib/wait')
 
-const INDICES = 'v3_api_v2'
-
 let client
 let status
 
@@ -11,20 +9,20 @@ function verifyRepository ({ repository }) {
   return client.snapshot.verifyRepository({ repository })
 }
 
-function createSnapshot ({ repository, name }) {
+function createSnapshot ({ repository, name, index }) {
   return client.snapshot.create({
     repository,
     snapshot: name,
     waitForCompletion: false,
     body: {
-      indices: INDICES,
+      indices: index,
       // we're snapshotting an index, not the cluster
       include_global_state: false
     }
   })
 }
 
-function pingSnapshot ({ repository, name }) {
+function pingStatus ({ repository, name }) {
   return client.snapshot.status({
     snapshot: name,
     repository
@@ -46,7 +44,7 @@ function pingSnapshot ({ repository, name }) {
         return Promise.reject('Snapshot failed')
       }
 
-      return wait(10000).then(() => pingSnapshot({ repository, name }))
+      return wait(10000).then(() => pingStatus({ repository, name }))
     })
 }
 
@@ -57,7 +55,7 @@ function run (region, opts) {
   return Promise.resolve()
     .then(() => verifyRepository(opts))
     .then(() => createSnapshot(opts))
-    .then(() => pingSnapshot(opts))
+    .then(() => pingStatus(opts))
     .then(() => console.log(`Snapshot "${opts.name}" created from ${region} region`))
     .catch((err) => console.error(`Snapshot failed: ${err.message}`))
 }
@@ -65,7 +63,8 @@ function run (region, opts) {
 module.exports = function (program) {
   program
     .command('snapshot <region>')
-    .description('Creates a snapshot')
+    .description('Creates an index snapshot')
+    .option('-I, --index <name>', 'The index name', 'v3_api_v2')
     .option('-N, --name <name>', 'The snapshot name', 'my-snapshot')
     .option('-R, --repository <name>', 'The repository name', 's3-snapshots')
     .action(run)
