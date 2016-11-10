@@ -2,6 +2,8 @@
 
 ## Installation and setup
 
+This tool requires **Node 6** or above.
+
 ```
 $ npm i -g next-es-tools
 ```
