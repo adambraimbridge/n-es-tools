@@ -20,7 +20,7 @@ if (fs.existsSync(env)) {
 }
 
 // register all tools
-const tools = ['repository', 'snapshot', 'uuids', 'workspace'];
+const tools = ['repository', 'restore', 'snapshot', 'uuids', 'workspace'];
 
 tools.forEach((tool) => {
   require(path.join('../tools/', tool))(program)
