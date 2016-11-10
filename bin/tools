@@ -13,18 +13,18 @@ if (fs.existsSync(env)) {
 } else {
   console.warn(
     '\x1b[31m\n',
-    'No .env configuration found, please run the workspace command',
+    'No .env configuration found\n',
+    'Please create or move into a workspace',
     '\x1b[0m\n'
   )
 }
 
 // register all tools
-const tools = {
-  repository: require('../tools/repository')(program),
-  snapshot: require('../tools/snapshot')(program),
-  uuids: require('../tools/uuids')(program),
-  workspace: require('../tools/workspace')(program)
-}
+const tools = ['repository', 'snapshot', 'uuids', 'workspace'];
+
+tools.forEach((tool) => {
+  require(path.join('../tools/', tool))(program)
+})
 
 const argv = program.parse(process.argv)
 
