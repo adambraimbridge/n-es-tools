@@ -28,10 +28,7 @@ function restoreSnapshot ({ repository, snapshot, index }) {
 }
 
 function pingStatus ({ snapshot, index }) {
-  return client.indices.recovery({
-    index,
-    activeOnly: true
-  })
+  return client.indices.recovery({ index })
     .then((response) => {
       // we'll just take the status of the primary shard for simplicity
       const stats = response[index].shards.find((item) => item.source.snapshot === snapshot)
