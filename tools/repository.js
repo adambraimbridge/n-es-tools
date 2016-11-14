@@ -18,17 +18,17 @@ function createRepository ({ name, bucketName, bucketRegion, bucketRole, bucketF
   })
 }
 
-function run (region, opts) {
-  client = elastic(region)
+function run (cluster, opts) {
+  client = elastic(cluster)
 
   return createRepository(opts)
-    .then(() => console.log(`Repository "${opts.name}" created in ${region} region`))
+    .then(() => console.log(`Repository "${opts.name}" created in ${cluster} cluster`))
     .catch((err) => console.error(`Repository failed: ${err.message}`))
 }
 
 module.exports = function (program) {
   program
-    .command('repository <region>')
+    .command('repository <cluster>')
     .description('Sets up a snapshot repository')
     .option('-N, --name <name>', 'The repository name', 's3-snapshots')
     .option('-B, --bucket-name <name>', 'The S3 bucket name', 'nextcontent-backups')

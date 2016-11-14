@@ -16,7 +16,7 @@ Next you'll need to create a workspace, to do so run:
 $ next-es-tools workspace path/to/workspace
 ```
 
-This will create a new directory (if it does not already exist) containing a single `.env` file. The tools require several keys and settings which _must_ to be added to this file. Any files created by the tool will also be stored here.
+This will create a new directory (if it does not already exist) containing a single `workspace.yml` file. The tools require several keys and settings which _must_ to be added to this file. Any files created by the tool will also be stored here.
 
 ## Usage
 
@@ -29,7 +29,7 @@ $ next-es-tools --help
 ### Snapshotting and restoring an index
 
 ```
-# set up a snapshot repository on both clusters
+# set up a snapshot repository for both source and target clusters
 $ next-es-tools repository eu
 $ next-es-tools repository us
 

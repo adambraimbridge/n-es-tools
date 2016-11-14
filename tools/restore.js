@@ -51,21 +51,21 @@ function pingStatus ({ snapshot, index }) {
     })
 }
 
-function run (region, opts) {
-  client = elastic(region)
+function run (cluster, opts) {
+  client = elastic(cluster)
   status = progress('Restoring snapshot')
 
   return Promise.resolve()
     .then(() => verifyRepository(opts))
     .then(() => restoreSnapshot(opts))
     .then(() => pingStatus(opts))
-    .then(() => console.log(`Restored snapshot "${opts.snapshot}" to ${region} region`))
+    .then(() => console.log(`Restored snapshot "${opts.snapshot}" to ${cluster} cluster`))
     .catch((err) => console.error(`Restore failed: ${err.message}`))
 }
 
 module.exports = function (program) {
   program
-    .command('restore <region>')
+    .command('restore <cluster>')
     .description('Restores an index snapshot')
     .option('-I, --index <name>', 'The index name', 'v3_api_v2')
     .option('-S, --snapshot <name>', 'The snapshot name', 'my-snapshot')

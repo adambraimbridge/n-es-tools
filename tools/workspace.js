@@ -2,6 +2,8 @@ const fs = require('fs')
 const path = require('path')
 const mkdirp = require('mkdirp')
 
+const FILE = 'workspace.yml'
+
 let output
 let target
 let source
@@ -28,8 +30,8 @@ function copyTemplate () {
 
 function run (directory) {
   output = path.resolve(directory)
-  source = path.join(__dirname, '../templates/.env.example')
-  target = path.join(output, '.env')
+  source = path.join(__dirname, '../templates', FILE)
+  target = path.join(output, FILE)
 
   return Promise.resolve()
     .then(makeSpace)

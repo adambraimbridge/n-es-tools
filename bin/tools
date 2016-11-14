@@ -2,19 +2,19 @@
 
 const fs = require('fs')
 const path = require('path')
-const dotenv = require('dotenv')
+const yaml = require('js-yaml')
 const program = require('commander')
 
 // try to load the .env from the current directory
-const env = path.join(process.cwd(), '.env')
+const config = path.join(process.cwd(), 'workspace.yml')
 
-if (fs.existsSync(env)) {
-  dotenv.config({ path: env })
+if (fs.existsSync(config)) {
+  global.workspace = yaml.safeLoad(fs.readFileSync(config, 'utf-8'))
 } else {
   console.warn(
     '\x1b[31m\n',
-    'No .env configuration found\n',
-    'Please create or move into a workspace',
+    'No workspace.yml found\n',
+    'Please create or move into a workspace folder',
     '\x1b[0m\n'
   )
 }

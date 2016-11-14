@@ -50,9 +50,9 @@ function writeOutput () {
   })
 }
 
-function run (region, { filename }) {
+function run (cluster, { filename }) {
   result = []
-  client = elastic(region)
+  client = elastic(cluster)
   status = progress('Downloading UUIDs')
   output = path.join(process.cwd(), filename)
 
@@ -60,13 +60,13 @@ function run (region, { filename }) {
     .then(fetchScan)
     .then(fetchScroll)
     .then(writeOutput)
-    .then(() => console.log(`UUIDs saved to ${output}`))
+    .then(() => console.log(`UUIDs from ${cluster} cluster saved to ${output}`))
     .catch((err) => console.error(`UUIDs failed: ${err.message}`))
 }
 
 module.exports = function (program) {
   program
-    .command('uuids <region>')
+    .command('uuids <cluster>')
     .description('Downloads all content UUIDs')
     .option('-F, --filename <filename>', 'The output filename', 'uuids.csv')
     .action(run)
