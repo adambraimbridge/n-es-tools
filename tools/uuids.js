@@ -19,7 +19,7 @@ function fetchScan () {
     sort: [ '_doc' ],
     scroll: '1m',
     size: 1000,
-    _source: false,
+    _source: false
   })
     .then((response) => {
       status.total = response.hits.total
