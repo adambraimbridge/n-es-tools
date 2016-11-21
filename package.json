@@ -13,6 +13,7 @@
     "next-es-tools": "./bin/tools"
   },
   "devDependencies": {
+    "npm-prepublish": "^1.2.2",
     "standard": "^8.5.0"
   }
 }
