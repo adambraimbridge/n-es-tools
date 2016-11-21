@@ -7,13 +7,13 @@ A useful CLI for working with Next's Elasticsearch clusters. Includes tools to s
 This tool requires **Node 6** or above. You can install it from NPM by running the following command:
 
 ```
-$ npm i -g @financial-times/next-es-tools
+$ npm i -g @financial-times/n-es-tools
 ```
 
 To then use the tool you'll first need to create a workspace. A workspace is a folder containing configuration data and is a place to store any files created by the tool. To create a new workspace run the `workspace` task:
 
 ```
-$ next-es-tools workspace path/to/my-workspace
+$ n-es-tools workspace path/to/my-workspace
 ```
 
 This will create a new directory (if it does not already exist) containing a single `workspace.yml` file. The tools require several keys and settings which _must to be added to this file_ in order to use it.
@@ -23,19 +23,19 @@ This will create a new directory (if it does not already exist) containing a sin
 You can view the available commands and options by running:
 
 ```
-$ next-es-tools --help
+$ n-es-tools --help
 ```
 
 ### Snapshotting and restoring an index
 
 ```
 # set up a snapshot repository for both source and target clusters
-$ next-es-tools repository eu
-$ next-es-tools repository us
+$ n-es-tools repository eu
+$ n-es-tools repository us
 
 # create a snapshot of the source index
-$ next-es-tools snapshot eu --index v3_api_v2
+$ n-es-tools snapshot eu --index v3_api_v2
 
 # restore index to the target cluster
-$ next-es-tools restore us --index v3_api_v2
+$ n-es-tools restore us --index v3_api_v2
 ```

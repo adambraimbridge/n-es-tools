@@ -1,5 +1,5 @@
 {
-  "name": "@financial-times/next-es-tools",
+  "name": "@financial-times/n-es-tools",
   "version": "0.0.0",
   "dependencies": {
     "commander": "^2.9.0",
@@ -10,9 +10,10 @@
     "progress": "^1.1.8"
   },
   "bin": {
-    "next-es-tools": "./bin/tools"
+    "n-es-tools": "./bin/tools"
   },
   "devDependencies": {
+    "npm-prepublish": "^1.2.2",
     "standard": "^8.5.0"
   }
 }
