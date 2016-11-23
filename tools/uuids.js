@@ -3,18 +3,16 @@ const path = require('path')
 const elastic = require('../lib/elastic')
 const progress = require('../lib/progress')
 
-const INDEX = 'v3_api_v2'
-const TYPE = 'item'
-
 let result
 let client
 let status
 let output
+let options
 
 function fetchScan () {
   return client.search({
-    index: INDEX,
-    type: TYPE,
+    index: options.index,
+    type: 'item',
     search_type: 'scan',
     sort: [ '_doc' ],
     scroll: '1m',
@@ -50,17 +48,18 @@ function writeOutput () {
   })
 }
 
-function run (cluster, { filename }) {
+function run (cluster, command) {
   result = []
   client = elastic(cluster)
   status = progress('Downloading UUIDs')
-  output = path.join(process.cwd(), filename)
+  output = path.join(process.cwd(), `uuids-${cluster}.txt`)
+  options = command.opts()
 
   return Promise.resolve()
     .then(fetchScan)
     .then(fetchScroll)
     .then(writeOutput)
-    .then(() => console.log(`UUIDs from ${cluster} cluster saved to ${output}`))
+    .then(() => console.log(`UUIDs saved to ${output}`))
     .catch((err) => console.error(`UUIDs failed: ${err.message}`))
 }
 
@@ -68,6 +67,6 @@ module.exports = function (program) {
   program
     .command('uuids <cluster>')
     .description('Downloads all content UUIDs')
-    .option('-F, --filename <filename>', 'The output filename', 'uuids.csv')
+    .option('-I, --index <name>', 'The index name', 'v3_api_v2')
     .action(run)
 }
