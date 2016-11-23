@@ -3,7 +3,6 @@ const path = require('path')
 const elastic = require('../lib/elastic')
 const progress = require('../lib/progress')
 
-let result
 let client
 let status
 let output
@@ -31,35 +30,32 @@ function fetchScroll (scrollId) {
     scrollId
   })
     .then((response) => {
+      const uuids = response.hits.hits.map((item) => item._id).join('\n')
+
+      output.write(uuids + '\n')
+
       status.tick(response.hits.hits.length)
-      response.hits.hits.forEach((item) => result.push(item._id))
 
       if (!status.complete) {
         return fetchScroll(response._scroll_id)
+      } else {
+        output.end()
       }
     })
 }
 
-function writeOutput () {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(output, result.sort().join('\n'), (err) => {
-      err ? reject(err) : resolve()
-    })
-  })
-}
-
 function run (cluster, command) {
-  result = []
+  const filename = path.join(process.cwd(), `uuids-${cluster}.txt`)
+
   client = elastic(cluster)
   status = progress('Downloading UUIDs')
-  output = path.join(process.cwd(), `uuids-${cluster}.txt`)
+  output = fs.createWriteStream(filename)
   options = command.opts()
 
   return Promise.resolve()
     .then(fetchScan)
     .then(fetchScroll)
-    .then(writeOutput)
-    .then(() => console.log(`UUIDs saved to ${output}`))
+    .then(() => console.log(`UUIDs saved to ${filename}`))
     .catch((err) => console.error(`UUIDs failed: ${err.message}`))
 }
 
