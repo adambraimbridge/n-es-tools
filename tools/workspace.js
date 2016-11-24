@@ -36,7 +36,7 @@ function writeTemplate (data) {
   })
 }
 
-function getHerokuKey () {
+function fetchHerokuAuth () {
   return new Promise((resolve, reject) => {
     const proc = spawn('heroku', [ 'config:get', 'APIKEY', '--app', 'ft-next-config-vars' ])
     const exit = () => proc.kill()
@@ -76,7 +76,7 @@ function fetchConfigVars (key) {
     })
 }
 
-function createWorkspaceYAML (data) {
+function createWorkspaceYAML (data = {}) {
   return readTemplate()
     .then((tmpl) => {
       const result = template(tmpl, data)
@@ -84,15 +84,17 @@ function createWorkspaceYAML (data) {
     })
 }
 
-function run (directory) {
+function run (directory, { skipConfigVars }) {
   output = path.resolve(directory)
   source = path.join(__dirname, '../templates', FILE)
   target = path.join(output, FILE)
 
+  const noop = () => {}
+
   return Promise.resolve()
     .then(createDirectory)
-    .then(getHerokuKey)
-    .then(fetchConfigVars)
+    .then(skipConfigVars ? noop : fetchHerokuAuth)
+    .then(skipConfigVars ? noop : fetchConfigVars)
     .then(createWorkspaceYAML)
     .then(() => console.log(`Workspace created in ${output}`))
     .catch((err) => console.error(`Workspace failed: ${err.toString()}`))
@@ -102,5 +104,6 @@ module.exports = function (program) {
   program
     .command('workspace <directory>')
     .description('Creates a new workspace')
+    .option('-S, --skip-config-vars', 'Skip trying to fetch config vars')
     .action(run)
 }
