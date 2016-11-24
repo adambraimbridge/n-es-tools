@@ -1,14 +1,18 @@
 const fs = require('fs')
 const path = require('path')
 const mkdirp = require('mkdirp')
+const fetch = require('node-fetch')
+const { spawn } = require('child_process')
+const template = require('../lib/template')
 
 const FILE = 'workspace.yml'
+const UUID = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/
 
 let output
 let target
 let source
 
-function makeSpace () {
+function createDirectory () {
   return new Promise((resolve, reject) => {
     mkdirp(output, (err) => {
       err ? reject(err) : resolve(output)
@@ -16,16 +20,68 @@ function makeSpace () {
   })
 }
 
-function copyTemplate () {
-  const read = fs.createReadStream(source)
-  const write = fs.createWriteStream(target)
-
+function readTemplate () {
   return new Promise((resolve, reject) => {
-    read.pipe(write)
-
-    write.on('error', reject)
-    write.on('close', resolve)
+    fs.readFile(source, (err, data) => {
+      err ? reject(err) : resolve(data.toString())
+    })
   })
+}
+
+function writeTemplate (data) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(target, data, (err) => {
+      err ? reject(err) : resolve()
+    })
+  })
+}
+
+function getHerokuKey () {
+  return new Promise((resolve, reject) => {
+    const proc = spawn('heroku', [ 'config:get', 'APIKEY', '--app', 'ft-next-config-vars' ])
+    const exit = () => proc.kill()
+
+    let data = ''
+
+    proc.stdout.on('data', (chunk) => {
+      data += chunk.toString().trim()
+    })
+
+    proc.stderr.on('data', exit)
+
+    proc.on('error', reject)
+
+    proc.on('exit', (code) => {
+      if (code === 0 && UUID.test(data)) {
+        resolve(data)
+      } else {
+        reject(data)
+      }
+    })
+  })
+}
+
+function fetchConfigVars (key) {
+  const url = 'https://ft-next-config-vars.herokuapp.com/development/n-es-tools'
+
+  return fetch(url, {
+    headers: { Authorization: key }
+  })
+    .then((res) => {
+      if (res.ok) {
+        return res.json()
+      } else {
+        throw new Error(`Config vars returned a ${res.status}`)
+      }
+    })
+}
+
+function createWorkspaceYAML (data) {
+  return readTemplate()
+    .then((tmpl) => {
+      const result = template(tmpl, data)
+      return writeTemplate(result)
+    })
 }
 
 function run (directory) {
@@ -34,10 +90,12 @@ function run (directory) {
   target = path.join(output, FILE)
 
   return Promise.resolve()
-    .then(makeSpace)
-    .then(copyTemplate)
+    .then(createDirectory)
+    .then(getHerokuKey)
+    .then(fetchConfigVars)
+    .then(createWorkspaceYAML)
     .then(() => console.log(`Workspace created in ${output}`))
-    .catch((err) => console.error(`Workspace failed: ${err.message}`))
+    .catch((err) => console.error(`Workspace failed: ${err.toString()}`))
 }
 
 module.exports = function (program) {
