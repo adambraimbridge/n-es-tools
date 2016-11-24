@@ -28,7 +28,7 @@ $ n-es-tools --help
 
 ### Snapshotting and restoring an index
 
-```
+```sh
 # set up a snapshot repository for both source and target clusters
 $ n-es-tools repository eu
 $ n-es-tools repository us
@@ -38,4 +38,15 @@ $ n-es-tools snapshot eu --index v3_api_v2
 
 # restore index to the target cluster
 $ n-es-tools restore us --index v3_api_v2
+```
+
+### Finding synchronisation problems
+
+```sh
+# fetch all UUIDs from each index
+$ n-es-tools uuids eu
+$ n-es-tools uuids us
+
+# find differences between them and advise what to do
+$ n-es-tools diff uuids-eu.txt uuids-us.txt
 ```
