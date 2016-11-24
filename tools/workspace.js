@@ -84,7 +84,7 @@ function createWorkspaceYAML (data = {}) {
     })
 }
 
-function run (directory, { skipConfigVars }) {
+function run (directory, { skipConfig }) {
   output = path.resolve(directory)
   source = path.join(__dirname, '../templates', FILE)
   target = path.join(output, FILE)
@@ -93,8 +93,8 @@ function run (directory, { skipConfigVars }) {
 
   return Promise.resolve()
     .then(createDirectory)
-    .then(skipConfigVars ? noop : fetchHerokuAuth)
-    .then(skipConfigVars ? noop : fetchConfigVars)
+    .then(skipConfig ? noop : fetchHerokuAuth)
+    .then(skipConfig ? noop : fetchConfigVars)
     .then(createWorkspaceYAML)
     .then(() => console.log(`Workspace created in ${output}`))
     .catch((err) => console.error(`Workspace failed: ${err.toString()}`))
@@ -104,6 +104,6 @@ module.exports = function (program) {
   program
     .command('workspace <directory>')
     .description('Creates a new workspace')
-    .option('-S, --skip-config-vars', 'Skip trying to fetch config vars')
+    .option('-S, --skip-config', 'Skip trying to fetch configuration settings')
     .action(run)
 }
