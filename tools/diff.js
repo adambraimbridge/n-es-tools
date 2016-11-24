@@ -75,11 +75,12 @@ function logAction ({ type, uuid }) {
 
   let advice = ''
 
-  switch (type) {
-    case 'ingest':
-      advice = `(not found in ${uniqueA.has(uuid) ? filenameB : filenameA})`
-    case 'delete':
-      advice = `(found in ${uniqueA.has(uuid) ? filenameA : filenameB})`
+  if (type === 'ingest') {
+    advice = `(not found in ${uniqueA.has(uuid) ? filenameB : filenameA})`
+  }
+
+  if (type === 'delete') {
+    advice = `(found in ${uniqueA.has(uuid) ? filenameA : filenameB})`
   }
 
   return `${type} ${uuid} ${advice}`
