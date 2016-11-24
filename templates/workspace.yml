@@ -1,17 +1,17 @@
 # AWS keys
 auth:
   # An access key with permissions to read and write to the Elasticsearch service
-  access_key:
+  access_key: {{AWS_ACCESS_KEY}}
   # The secret key to match the access key above
-  secret_key:
+  secret_key: {{AWS_SECRET_ACCESS_KEY}}
 
 # Paths to the Elasticsearch clusters to be managed
 clusters:
-  eu: https://nextcontent-123.eu-west-1.es.amazonaws.com
-  us: https://nextcontent-123.us-east-1.es.amazonaws.com
-  dev: https://nextcontentdev-123.eu-west-1.es.amazonaws.com
+  eu: {{ELASTIC_SEARCH_HOST_US}}
+  us: {{ELASTIC_SEARCH_HOST_EU}}
+  dev: {{ELASTIC_SEARCH_HOST_DEV}}
 
 # API keys
 keys:
   # Key for the FT content API (V1 and V2)
-  capi:
+  capi: {{API_KEY}}
