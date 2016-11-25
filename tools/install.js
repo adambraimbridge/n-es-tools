@@ -89,7 +89,7 @@ function run ({ skipConfig }) {
     .then(skipConfig ? noop : fetchHerokuAuth)
     .then(skipConfig ? noop : fetchConfigVars)
     .then(createConfigFile)
-    .then(() => console.log(`Install complete, configuration files created in ${configPath}`))
+    .then(() => console.log(`Install complete, created ${configPath}`))
     .catch((err) => console.error(`Install failed: ${err.toString()}`))
 }
 
