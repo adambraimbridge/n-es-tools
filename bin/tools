@@ -4,23 +4,21 @@ const fs = require('fs')
 const path = require('path')
 const yaml = require('js-yaml')
 const program = require('commander')
+const configPath = require('../lib/config-path')
 
-// try to load the .env from the current directory
-const config = path.join(process.cwd(), 'workspace.yml')
-
-if (fs.existsSync(config)) {
-  global.workspace = yaml.safeLoad(fs.readFileSync(config, 'utf-8'))
+// try to load config.yml
+if (fs.existsSync(configPath)) {
+  global.workspace = yaml.safeLoad(fs.readFileSync(configPath, 'utf-8'))
 } else {
   console.warn(
     '\x1b[31m\n',
-    'No workspace.yml found\n',
-    'Please create or move into a workspace folder',
+    'No config.yml found, please run the install task',
     '\x1b[0m\n'
   )
 }
 
 // register all tools
-const tools = ['diff', 'repository', 'restore', 'snapshot', 'uuids', 'workspace'];
+const tools = ['diff', 'install', 'repository', 'restore', 'snapshot', 'uuids'];
 
 tools.forEach((tool) => {
   require(path.join('../tools/', tool))(program)
