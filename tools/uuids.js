@@ -44,7 +44,7 @@ function fetchScroll (scrollId) {
     })
 }
 
-function run (cluster, command) {
+function action (cluster, command) {
   const filename = path.join(process.cwd(), `uuids-${cluster}.txt`)
 
   client = elastic(cluster)
@@ -59,10 +59,12 @@ function run (cluster, command) {
     .catch((err) => console.error(`UUIDs failed: ${err.message}`))
 }
 
-module.exports = function (program) {
+function register (program) {
   program
     .command('uuids <cluster>')
     .description('Downloads all content UUIDs')
     .option('-I, --index <name>', 'The index name', 'v3_api_v2')
-    .action(run)
+    .action(action)
 }
+
+module.exports = { action, register }

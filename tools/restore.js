@@ -48,7 +48,7 @@ function pingStatus ({ snapshot, index }) {
     })
 }
 
-function run (cluster, opts) {
+function action (cluster, opts) {
   client = elastic(cluster)
   status = progress('Restoring snapshot')
 
@@ -60,12 +60,14 @@ function run (cluster, opts) {
     .catch((err) => console.error(`Restore failed: ${err.message}`))
 }
 
-module.exports = function (program) {
+function register (program) {
   program
     .command('restore <cluster>')
     .description('Restores an index snapshot')
     .option('-I, --index <name>', 'The index name', 'v3_api_v2')
     .option('-S, --snapshot <name>', 'The snapshot name', 'my-snapshot')
     .option('-R, --repository <name>', 'The repository name', 's3-snapshots')
-    .action(run)
+    .action(action)
 }
+
+module.exports = { action, register }

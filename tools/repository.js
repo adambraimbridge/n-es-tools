@@ -18,7 +18,7 @@ function createRepository ({ name, bucketName, bucketRegion, bucketRole, bucketF
   })
 }
 
-function run (cluster, opts) {
+function action (cluster, opts) {
   client = elastic(cluster)
 
   return createRepository(opts)
@@ -26,7 +26,7 @@ function run (cluster, opts) {
     .catch((err) => console.error(`Repository failed: ${err.message}`))
 }
 
-module.exports = function (program) {
+function register (program) {
   program
     .command('repository <cluster>')
     .description('Sets up a snapshot repository')
@@ -35,5 +35,7 @@ module.exports = function (program) {
     .option('-R, --bucket-region <region>', 'The S3 bucket region', 'eu-west-1')
     .option('-A, --bucket-role <arn>', 'The S3 bucket ARN role', 'arn:aws:iam::027104099916:role/FTApplicationRoleFor_nextcontent')
     .option('-F, --bucket-folder <name>', 'The S3 bucket subfolder', new Date().toISOString().split('T').shift())
-    .action(run)
+    .action(action)
 }
+
+module.exports = { action, register }

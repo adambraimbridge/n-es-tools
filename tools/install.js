@@ -81,7 +81,7 @@ function createConfigFile (data = {}) {
   })
 }
 
-function run ({ skipConfig }) {
+function action ({ skipConfig }) {
   const noop = () => {}
 
   return Promise.resolve()
@@ -93,10 +93,12 @@ function run ({ skipConfig }) {
     .catch((err) => console.error(`Install failed: ${err.toString()}`))
 }
 
-module.exports = function (program) {
+function register (program) {
   program
     .command('install')
     .description('Creates the necessary configuration files')
     .option('-S, --skip-config', 'Skip fetching configuration values')
-    .action(run)
+    .action(action)
 }
+
+module.exports = { action, register }

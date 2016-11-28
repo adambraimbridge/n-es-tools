@@ -4,6 +4,7 @@ const wait = require('../lib/wait')
 
 let client
 let status
+let options
 
 function verifyRepository ({ repository }) {
   return client.snapshot.verifyRepository({ repository })
@@ -48,24 +49,27 @@ function pingStatus ({ repository, name }) {
     })
 }
 
-function run (cluster, opts) {
+function action (cluster, command) {
   client = elastic(cluster)
   status = progress('Creating snapshot')
+  options = command.opts()
 
   return Promise.resolve()
-    .then(() => verifyRepository(opts))
-    .then(() => createSnapshot(opts))
-    .then(() => pingStatus(opts))
-    .then(() => console.log(`Snapshot "${opts.name}" created from ${cluster} cluster`))
+    .then(() => verifyRepository(options))
+    .then(() => createSnapshot(options))
+    .then(() => pingStatus(options))
+    .then(() => console.log(`Snapshot "${options.name}" created from ${cluster} cluster`))
     .catch((err) => console.error(`Snapshot failed: ${err.message}`))
 }
 
-module.exports = function (program) {
+function register (program) {
   program
     .command('snapshot <cluster>')
     .description('Creates an index snapshot')
     .option('-I, --index <name>', 'The index name', 'v3_api_v2')
     .option('-N, --name <name>', 'The snapshot name', 'my-snapshot')
     .option('-R, --repository <name>', 'The repository name', 's3-snapshots')
-    .action(run)
+    .action(action)
 }
+
+module.exports = { action, register }

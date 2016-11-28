@@ -86,7 +86,7 @@ function logAction ({ type, uuid }) {
   return `${type} ${uuid} ${advice}`
 }
 
-function run ([ fileA, fileB ], command) {
+function action ([ fileA, fileB ], command) {
   // Sets are extremely performant with a large # of entries
   uniqueA = new Set()
   uniqueB = new Set()
@@ -107,9 +107,11 @@ function run ([ fileA, fileB ], command) {
     .catch((err) => console.error(`Diff failed: ${err.message}`))
 }
 
-module.exports = function (program) {
+function register (program) {
   program
     .command('diff <files...>')
     .description('Finds differences between two sets of UUIDs')
-    .action(run)
+    .action(action)
 }
+
+module.exports = { action, register }
