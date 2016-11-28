@@ -15,15 +15,9 @@ You can install the tool from NPM by running the following command:
 $ npm i -g @financial-times/n-es-tools
 ```
 
-To then use the tool you'll first need to create a workspace. A workspace is a folder containing configuration data and is a place to store any files created by the tool. To create a new workspace run the `workspace` task:
+This will create a new folder in your home directory containing a single `config.yml` file. The tool requires several configuration settings which _must to be added to this file_ in order to use it.
 
-```
-$ n-es-tools workspace path/to/my-workspace
-```
-
-This will create a new folder (if it does not already exist) containing a single `workspace.yml` configuration file. The tool requires several configuration settings which _must to be added to this file_ in order to use it.
-
-**Note:** By default the tool assumes that you have the [Heroku CLI][heroku-cli] installed and are logged in. It will attempt to download and apply the required configuration settings automatically. This may be skipped using the `--skip-config` flag.
+**Note:** By default the tool assumes that you have the [Heroku CLI][heroku-cli] installed and are logged in. It will attempt to download and apply the required configuration settings automatically. This may be skipped using the `--skip-config` flag when running install manually.
 
 ## Usage
 

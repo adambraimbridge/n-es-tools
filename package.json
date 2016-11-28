@@ -10,8 +10,11 @@
     "node-fetch": "^1.6.3",
     "progress": "^1.1.8"
   },
+  "scripts": {
+    "postinstall": "node bin/tools install"
+  },
   "bin": {
-    "n-es-tools": "./bin/tools"
+    "n-es-tools": "bin/tools"
   },
   "devDependencies": {
     "npm-prepublish": "^1.2.2",

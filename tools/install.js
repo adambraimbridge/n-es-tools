@@ -4,24 +4,22 @@ const mkdirp = require('mkdirp')
 const fetch = require('node-fetch')
 const { spawn } = require('child_process')
 const template = require('../lib/template')
+const configPath = require('../lib/config-path')
 
-const FILE = 'workspace.yml'
 const UUID = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/
-
-let output
-let target
-let source
 
 function createDirectory () {
   return new Promise((resolve, reject) => {
-    mkdirp(output, (err) => {
-      err ? reject(err) : resolve(output)
+    mkdirp(path.dirname(configPath), (err) => {
+      err ? reject(err) : resolve()
     })
   })
 }
 
 function readTemplate () {
   return new Promise((resolve, reject) => {
+    const source = path.join(__dirname, '../templates/config.yml')
+
     fs.readFile(source, (err, data) => {
       err ? reject(err) : resolve(data.toString())
     })
@@ -30,7 +28,7 @@ function readTemplate () {
 
 function writeTemplate (data) {
   return new Promise((resolve, reject) => {
-    fs.writeFile(target, data, (err) => {
+    fs.writeFile(configPath, data, (err) => {
       err ? reject(err) : resolve()
     })
   })
@@ -76,34 +74,29 @@ function fetchConfigVars (key) {
     })
 }
 
-function createWorkspaceYAML (data = {}) {
-  return readTemplate()
-    .then((tmpl) => {
-      const result = template(tmpl, data)
-      return writeTemplate(result)
-    })
+function createConfigFile (data = {}) {
+  return readTemplate().then((tmpl) => {
+    const result = template(tmpl, data)
+    return writeTemplate(result)
+  })
 }
 
-function run (directory, { skipConfig }) {
-  output = path.resolve(directory)
-  source = path.join(__dirname, '../templates', FILE)
-  target = path.join(output, FILE)
-
+function run ({ skipConfig }) {
   const noop = () => {}
 
   return Promise.resolve()
     .then(createDirectory)
     .then(skipConfig ? noop : fetchHerokuAuth)
     .then(skipConfig ? noop : fetchConfigVars)
-    .then(createWorkspaceYAML)
-    .then(() => console.log(`Workspace created in ${output}`))
-    .catch((err) => console.error(`Workspace failed: ${err.toString()}`))
+    .then(createConfigFile)
+    .then(() => console.log(`Install complete, created ${configPath}`))
+    .catch((err) => console.error(`Install failed: ${err.toString()}`))
 }
 
 module.exports = function (program) {
   program
-    .command('workspace <directory>')
-    .description('Creates a new workspace')
-    .option('-S, --skip-config', 'Skip trying to fetch configuration settings')
+    .command('install')
+    .description('Creates the necessary configuration files')
+    .option('-S, --skip-config', 'Skip fetching configuration values')
     .action(run)
 }
