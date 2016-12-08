@@ -44,7 +44,7 @@ function testCAPI (uuid) {
       const status1 = res1.status
       const status2 = res2.status
 
-      // CAPI V1 may return a 403 because =/
+      // CAPI V1 may return a 403 or a 410
       if (/^4/.test(status1) && status2 === 404) {
         return { type: 'delete', uuid }
       }
@@ -65,7 +65,7 @@ function fetchCapiV1 (uuid) {
 
 function fetchCapiV2 (uuid) {
   return fetch(`https://api.ft.com/enrichedcontent/${uuid}`, {
-    headers: { 'Authorization': global.workspace.keys.capi }
+    headers: { 'X-Api-Key': global.workspace.keys.capi }
   })
 }
 
