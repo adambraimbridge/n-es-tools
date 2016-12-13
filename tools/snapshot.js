@@ -48,7 +48,9 @@ function pingStatus ({ repository, name }) {
     })
 }
 
-function run (cluster, opts) {
+function run (cluster, command) {
+  const opts = command.opts()
+
   client = elastic(cluster)
   status = progress('Creating snapshot')
 
