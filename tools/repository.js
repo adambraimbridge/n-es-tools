@@ -18,11 +18,22 @@ function createRepository ({ name, bucketName, bucketRegion, bucketRole, bucketF
   })
 }
 
-function run (cluster, opts) {
+function run (cluster, command) {
+  const opts = command.opts()
+
   client = elastic(cluster)
 
+  // infer the bucket region and name from the client if not specified
+  if (!opts.bucketRegion) {
+    opts.bucketRegion = client.host.region
+  }
+
+  if (!opts.bucketName) {
+    opts.bucketName = `nextcontent-${client.host.region}-backups`
+  }
+
   return createRepository(opts)
-    .then(() => console.log(`Repository "${opts.name}" created in ${cluster} cluster`))
+    .then(() => console.log(`Repository "${opts.name}" created (using the bucket "${opts.bucketName}") for ${cluster} cluster`))
     .catch((err) => console.error(`Repository failed: ${err.message}`))
 }
 
@@ -31,8 +42,8 @@ module.exports = function (program) {
     .command('repository <cluster>')
     .description('Sets up a snapshot repository')
     .option('-N, --name <name>', 'The repository name', 's3-snapshots')
-    .option('-B, --bucket-name <name>', 'The S3 bucket name', 'nextcontent-backups')
-    .option('-R, --bucket-region <region>', 'The S3 bucket region', 'eu-west-1')
+    .option('-B, --bucket-name <name>', 'The S3 bucket name', '')
+    .option('-R, --bucket-region <region>', 'The S3 bucket region', '')
     .option('-A, --bucket-role <arn>', 'The S3 bucket ARN role', 'arn:aws:iam::027104099916:role/FTApplicationRoleFor_nextcontent')
     .option('-F, --bucket-folder <name>', 'The S3 bucket subfolder', new Date().toISOString().split('T').shift())
     .action(run)
