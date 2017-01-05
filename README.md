@@ -82,6 +82,96 @@ Here's the policy attached to the `next-es-tools` user that this tool authentica
             "Action": [
                 "cloudformation:DeleteStack"
             ],
+            "Resource": [
+                "arn:aws:cloudformation:::stack/next-content-*"
+            ]
+        },
+        {
+            "Sid": "AllowCloudFormationStackManagement",
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:CancelUpdateStack",
+                "cloudformation:ContinueUpdateRollback",
+                "cloudformation:CreateChangeSet",
+                "cloudformation:ExecuteChangeSet",
+                "cloudformation:Get*",
+                "cloudformation:List*",
+                "cloudformation:PreviewStackUpdate",
+                "cloudformation:SetStackPolicy",
+                "cloudformation:SignalResource",
+                "cloudformation:UpdateStack"
+            ],
+            "Resource": [
+                "arn:aws:cloudformation:::stack/next-content-*",
+                "arn:aws:cloudformation:::stack/nextcontent",
+                "arn:aws:cloudformation:::stack/nextelasticdev"
+            ]
+        },
+        {
+            "Sid": "AllowNextContentElasticsearchDomainCreation",
+            "Effect": "Allow",
+            "Action": [
+                "es:CreateElasticsearchDomain",
+                "es:Describe*",
+                "es:List*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "AllowNextContentElasticsearchDomainDeletion",
+            "Effect": "Allow",
+            "Action": [
+                "es:DeleteElasticsearchDomain"
+            ],
+            "Resource": [
+                "arn:aws:es:::domain/next-content-*",
+                "arn:aws:es:::domain/nextcontent",
+                "arn:aws:es:::domain/nextelasticdev"
+            ]
+        },
+        {
+            "Sid": "AllowNextContentElasticsearchDomainManagement",
+            "Effect": "Allow",
+            "Action": [
+                "es:AddTags",
+                "es:RemoveTags",
+                "es:UpdateElasticsearchDomainConfig"
+            ],
+            "Resource": [
+                "arn:aws:es:::domain/next-content-*",
+                "arn:aws:es:::domain/nextcontent",
+                "arn:aws:es:::domain/nextelasticdev"
+            ]
+        },
+        {
+            "Sid": "AllowPassRoleForRepositoryCreation",
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::027104099916:role/FTApplicationRoleFor_nextcontent"
+        },
+        {
+            "Sid": "AllowKeyRotation",
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateAccessKey",
+                "iam:DeleteAccessKey",
+                "iam:ListAccessKeys",
+                "iam:UpdateAccessKey"
+            ],
+            "Resource": "arn:aws:iam:::user/${aws:username}"
+        }
+    ]
+}
+                "cloudformation:ValidateTemplate"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "AllowCloudFormationStackDeletion",
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:DeleteStack"
+            ],
             "Resource": "arn:aws:cloudformation:::stack/next-content-*"
         },
         {
