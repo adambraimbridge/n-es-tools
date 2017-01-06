@@ -66,7 +66,7 @@ module.exports = function (program) {
   program
     .command('restore <cluster>')
     .description('Restores an index snapshot')
-    .option('-I, --index <name>', 'The index name', 'v3_api_v2')
+    .option('-I, --index <name>', 'The index name', 'content')
     .option('-S, --snapshot <name>', 'The snapshot name', 'my-snapshot')
     .option('-R, --repository <name>', 'The repository name', 's3-snapshots')
     .action(run)
