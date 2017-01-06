@@ -63,6 +63,6 @@ module.exports = function (program) {
   program
     .command('uuids <cluster>')
     .description('Downloads all content UUIDs')
-    .option('-I, --index <name>', 'The index name', 'v3_api_v2')
+    .option('-I, --index <name>', 'The index name', 'content')
     .action(run)
 }

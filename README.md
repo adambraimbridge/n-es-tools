@@ -35,10 +35,10 @@ $ n-es-tools repository eu
 $ n-es-tools repository us
 
 # create a snapshot of the source index
-$ n-es-tools snapshot eu --index v3_api_v2
+$ n-es-tools snapshot eu --index content
 
 # restore index to the target cluster
-$ n-es-tools restore us --index v3_api_v2
+$ n-es-tools restore us --index content
 ```
 
 ### Finding synchronisation problems
