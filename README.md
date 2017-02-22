@@ -1,4 +1,4 @@
-# Next Elasticsearch Tools
+# Next Elasticsearch Tools [![CircleCI](https://circleci.com/gh/Financial-Times/n-es-tools.svg?style=svg)](https://circleci.com/gh/Financial-Times/n-es-tools)
 
 A useful CLI for working with Next's Elasticsearch clusters. Includes tools to snapshot and restore indexes.
 
