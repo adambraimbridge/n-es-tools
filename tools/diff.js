@@ -58,13 +58,20 @@ function testCAPI (uuid) {
 
 function fetchCapiV1 (uuid) {
   return fetch(`https://api.ft.com/content/items/v1/${uuid}`, {
-    headers: { 'X-Api-Key': global.workspace.keys.capi }
+    headers: {
+      'X-Api-Key': global.workspace.keys.capi,
+      // allow access to wires
+      'X-FT-API-Content-Control-Policy': 'FT_B2C_FT_COM_CONTENT_POLICY_2013'
+    }
   })
 }
 
 function fetchCapiV2 (uuid) {
   return fetch(`https://api.ft.com/enrichedcontent/${uuid}`, {
-    headers: { 'X-Api-Key': global.workspace.keys.capi }
+    headers: {
+      'X-Api-Key': global.workspace.keys.capi,
+      'X-Policy': 'INCLUDE_RICH_CONTENT, INCLUDE_COMMENTS, INTERNAL_UNSTABLE, INCLUDE_PROVENANCE'
+    }
   })
 }
 
