@@ -44,8 +44,7 @@ function testCAPI (uuid) {
       const status1 = res1.status
       const status2 = res2.status
 
-      // CAPI V1 may return a 403 or a 410
-      if (/^4/.test(status1) && status2 === 404) {
+      if (status1 === 404 && status2 === 404) {
         return { type: 'delete', uuid }
       }
 
