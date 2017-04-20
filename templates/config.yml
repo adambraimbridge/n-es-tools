@@ -15,3 +15,5 @@ clusters:
 keys:
   # Key for the FT content API (V1 and V2)
   capi: {{API_KEY}}
+  # Key for the ES interface API
+  es_interface: {{ES_INTERFACE_API_KEY}}
