@@ -97,9 +97,11 @@ function run ([ fileA, fileB ], command) {
     .then((actions) => {
       console.log(`Diff complete, ${actions.length} actions required`)
       console.log(actions.map(logAction).join('\n'))
+      process.exit()
     })
     .catch((err) => {
       console.error(`Diff failed: ${err.toString()}`)
+      process.exit(1)
     })
 }
 

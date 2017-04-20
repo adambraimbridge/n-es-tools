@@ -33,8 +33,14 @@ function run (cluster, command) {
   }
 
   return createRepository(opts)
-    .then(() => console.log(`Repository "${opts.name}" created (using the bucket "${opts.bucketName}") for ${cluster} cluster`))
-    .catch((err) => console.error(`Repository failed: ${err.message}`))
+    .then(() => {
+      console.log(`Repository "${opts.name}" created (using the bucket "${opts.bucketName}") for ${cluster} cluster`)
+      process.exit()
+    })
+    .catch((err) => {
+      console.error(`Repository failed: ${err.toString()}`)
+      process.exit(1)
+    })
 }
 
 module.exports = function (program) {

@@ -58,8 +58,14 @@ function run (cluster, command) {
     .then(() => verifyRepository(opts))
     .then(() => createSnapshot(opts))
     .then(() => pingStatus(opts))
-    .then(() => console.log(`Snapshot "${opts.name}" created from ${cluster} cluster`))
-    .catch((err) => console.error(`Snapshot failed: ${err.message}`))
+    .then(() => {
+      console.log(`Snapshot "${opts.name}" created from ${cluster} cluster`)
+      process.exit()
+    })
+    .catch((err) => {
+      console.error(`Snapshot failed: ${err.toString()}`)
+      process.exit(1)
+    })
 }
 
 module.exports = function (program) {
