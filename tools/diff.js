@@ -1,26 +1,14 @@
-const fs = require('fs')
 const path = require('path')
 const fetch = require('node-fetch')
-const readline = require('readline')
+const readFile = require('../lib/read-file')
 
 let options
 let uniqueA
 let uniqueB
 
-function loadFile (filename, cb) {
-  const fullpath = path.join(process.cwd(), filename)
-
-  // This is more complex than fs.readFile but it means
-  // we do not have to buffer the whole thing in memory
-  return new Promise((resolve, reject) => {
-    const input = fs.createReadStream(fullpath)
-    const reader = readline.createInterface({ input })
-
-    input.on('error', reject)
-
-    reader.on('line', cb)
-    reader.on('close', resolve)
-  })
+function loadFile (filename, callback) {
+  const filepath = path.join(process.cwd(), filename)
+  return readFile(filepath, callback)
 }
 
 function handleA (line) {
@@ -109,8 +97,12 @@ function run ([ fileA, fileB ], command) {
     .then((actions) => {
       console.log(`Diff complete, ${actions.length} actions required`)
       console.log(actions.map(logAction).join('\n'))
+      process.exit()
     })
-    .catch((err) => console.error(`Diff failed: ${err.message}`))
+    .catch((err) => {
+      console.error(`Diff failed: ${err.toString()}`)
+      process.exit(1)
+    })
 }
 
 module.exports = function (program) {

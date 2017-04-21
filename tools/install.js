@@ -89,11 +89,22 @@ function run ({ skipConfig }) {
     .then(skipConfig ? noop : fetchHerokuAuth)
     .then(skipConfig ? noop : fetchConfigVars)
     .then(createConfigFile)
-    .then(() => console.log(`Install complete, created ${configPath}`))
-    .catch((err) => console.error(`Install failed: ${err.toString()}`))
+    .then(() => {
+      console.log(`Install complete, created ${configPath}`)
+      process.exit()
+    })
+    .catch((err) => {
+      console.error(`Install failed: ${err.toString()}`)
+      process.exit(1)
+    })
 }
 
 module.exports = function (program) {
+  if (process.env.CI) {
+    console.log('CI environment detected, skipping install step')
+    process.exit()
+  }
+
   program
     .command('install')
     .description('Creates the necessary configuration files')
