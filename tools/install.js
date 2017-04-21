@@ -100,6 +100,11 @@ function run ({ skipConfig }) {
 }
 
 module.exports = function (program) {
+  if (process.env.CI) {
+    console.log('CI environment detected, skipping install step')
+    process.exit()
+  }
+
   program
     .command('install')
     .description('Creates the necessary configuration files')
