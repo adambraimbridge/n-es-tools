@@ -1,9 +1,8 @@
 const path = require('path')
-const fetch = require('node-fetch')
-const throttle = require('promise-parallel-throttle')
-const wait = require('../lib/wait')
+const request = require('../lib/request')
 const progress = require('../lib/progress')
 const readFile = require('../lib/read-file')
+const orderlyQueue = require('../lib/orderly-queue')
 
 let status
 let failures
@@ -17,15 +16,11 @@ function loadFile (filename) {
 }
 
 function queue (uuids) {
-  // a generator may be better ¯\_(ツ)_/¯
-  const tasks = uuids.map((uuid) => ingest.bind(null, uuid))
-  // try to avoid running into rate-limits
-  const limit = () => wait(500)
-  const update = () => status.tick()
+  const tick = () => status.tick()
 
-  status.total = tasks.length
+  status.total = uuids.length
 
-  return throttle.all(tasks, 10, true, update, limit)
+  return orderlyQueue({ queue: uuids, callback: ingest, progress: tick })
 }
 
 function ingest (uuid) {
@@ -41,12 +36,9 @@ function ingest (uuid) {
 
   // this will double up overhead of modelling but it is simple
   return Promise.all([
-    fetch('https://ft-next-es-interface-eu.herokuapp.com/api/item', params),
-    fetch('https://ft-next-es-interface-us.herokuapp.com/api/item', params)
+    request('https://ft-next-es-interface-eu.herokuapp.com/api/item', params),
+    request('https://ft-next-es-interface-us.herokuapp.com/api/item', params)
   ])
-    .catch(() => {
-      failures.push(uuid)
-    })
 }
 
 function run (file) {
