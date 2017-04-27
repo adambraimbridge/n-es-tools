@@ -14,7 +14,7 @@ function fetchScan () {
     type: 'item',
     sort: [ '_doc' ],
     scroll: '1m',
-    size: 10000,
+    size: 5000,
     _source: false
   })
     .then((response) => {
@@ -55,8 +55,14 @@ function run (cluster, command) {
   return Promise.resolve()
     .then(fetchScan)
     .then(fetchScroll)
-    .then(() => console.log(`UUIDs saved to ${filename}`))
-    .catch((err) => console.error(`UUIDs failed: ${err.message}`))
+    .then(() => {
+      console.log(`UUIDs saved to ${filename}`)
+      process.exit()
+    })
+    .catch((err) => {
+      console.error(`UUIDs failed: ${err.toString()}`)
+      process.exit(1)
+    })
 }
 
 module.exports = function (program) {
