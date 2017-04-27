@@ -12,7 +12,6 @@ function fetchScan () {
   return client.search({
     index: options.index,
     type: 'item',
-    search_type: 'scan',
     sort: [ '_doc' ],
     scroll: '1m',
     size: 5000,
@@ -20,6 +19,10 @@ function fetchScan () {
   })
     .then((response) => {
       status.total = response.hits.total
+
+      response.hits.hits.forEach((item, i) => output.write(item._id + '\n'))
+      status.tick(response.hits.hits.length)
+
       return response._scroll_id
     })
 }
@@ -30,13 +33,10 @@ function fetchScroll (scrollId) {
     scrollId
   })
     .then((response) => {
-      const uuids = response.hits.hits.map((item) => item._id).join('\n')
-
-      output.write(uuids + '\n')
-
+      response.hits.hits.forEach((item, i) => output.write(item._id + '\n'))
       status.tick(response.hits.hits.length)
 
-      if (!status.complete) {
+      if (response.hits.hits.length > 0) {
         return fetchScroll(response._scroll_id)
       } else {
         output.end()
