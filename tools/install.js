@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const mkdirp = require('mkdirp')
 const fetch = require('node-fetch')
-const { spawn } = require('child_process')
+const shell = require('../lib/shell')
 const template = require('../lib/template')
 const configPath = require('../lib/config-path')
 
@@ -34,29 +34,19 @@ function writeTemplate (data) {
   })
 }
 
+function fetchHerokuStatus () {
+  return shell('heroku', [ 'whoami' ])
+}
+
 function fetchHerokuAuth () {
-  return new Promise((resolve, reject) => {
-    const proc = spawn('heroku', [ 'config:get', 'APIKEY', '--app', 'ft-next-config-vars' ])
-    const exit = () => proc.kill()
-
-    let data = ''
-
-    proc.stdout.on('data', (chunk) => {
-      data += chunk.toString().trim()
-    })
-
-    proc.stderr.on('data', exit)
-
-    proc.on('error', reject)
-
-    proc.on('exit', (code) => {
-      if (code === 0 && UUID.test(data)) {
-        resolve(data)
+  return shell('heroku', [ 'config:get', 'APIKEY', '--app', 'ft-next-config-vars' ])
+    .then((output) => {
+      if (UUID.test(output)) {
+        return Promise.resolve(output)
       } else {
-        reject(data)
+        return Promise.reject(output)
       }
     })
-  })
 }
 
 function fetchConfigVars (key) {
@@ -86,6 +76,7 @@ function run ({ skipConfig }) {
 
   return Promise.resolve()
     .then(createDirectory)
+    .then(skipConfig ? noop : fetchHerokuStatus)
     .then(skipConfig ? noop : fetchHerokuAuth)
     .then(skipConfig ? noop : fetchConfigVars)
     .then(createConfigFile)
