@@ -1,12 +1,6 @@
-const fs = require('fs')
-const path = require('path')
 const elastic = require('../lib/elastic')
-const progress = require('../lib/progress')
 
 let client
-let status
-let output
-let options
 
 function fetchAliases () {
   return client.cat.aliases({
@@ -14,51 +8,59 @@ function fetchAliases () {
   })
 }
 
-function fetchLatestIndex () {
-  const DATE = /(\d{4}-\d{2}-\d{2})/
-
+function fetchIndices () {
   return client.cat.indices({
     format: 'json'
   })
-    .then((response) => {
-      return response
-        // extract index names
+}
+
+function extractCurrentIndex (aliases) {
+  return aliases[0].index
+}
+
+function extractLatestIndex (indices) {
+  const PATTERN = /^content_\d{4}-\d{2}-\d{2}$/
+  const DATE = /(\d{4}-\d{2}-\d{2})/
+
+  return indices
+        // pull out index names
         .map((item) => item.index)
         // ignore kibana etc.
-        .filter((index) => /^content_/.test(index))
+        .filter((index) => PATTERN.test(index))
         // sort by date, oldest to newest
         .sort((a, b) => new Date(a.match(DATE).pop()) - new Date(b.match(DATE).pop()))
         // we have a winner!
         .pop()
-    })
 }
 
-function updateAliases (aliases, target) {
-  const actions = []
+function updateAliases (aliases, indices) {
+  const current = extractCurrentIndex(aliases)
+  const latest = extractLatestIndex(indices)
 
-  aliases.forEach((alias) => {
-    actions.push({ remove: { index: alias.index, alias: alias.alias } })
-    actions.push({ add: { index: target, alias: alias.alias } })
-  })
+  if (current === latest) {
+    throw new Error(`Current index and latest index are the same (${latest})`)
+  }
+
+  const actions = aliases.reduce((actions, { alias }) => {
+    console.log(`Removing ${current} => ${alias}`)
+    actions.push({ remove: { index: current, alias } })
+
+    console.log(`Adding ${latest} => ${alias}`)
+    actions.push({ add: { index: latest, alias } })
+
+    return actions
+  }, [])
 
   return client.indices.updateAliases({ body: { actions } })
 }
 
 function run (cluster, command) {
   client = elastic(cluster)
-  options = command.opts()
 
-  return Promise.all([ fetchAliases(), fetchLatestIndex() ])
-    .then(([ aliases, target ]) => {
-      if (aliases[0].index === target) {
-        throw new Error (`Current index and target index are the same (${target})`)
-      } else {
-        return updateAliases(aliases, target)
-      }
-    })
-    .then(fetchAliases)
-    .then((aliases) => {
-      console.log(`Alias complete: ${aliases.map(({ index, alias }) => `${alias} => ${index}`).join(', ')}`)
+  return Promise.all([ fetchAliases(), fetchIndices() ])
+    .then(([ aliases, indices ]) => updateAliases(aliases, indices))
+    .then(() => {
+      console.log('Alias complete')
       process.exit()
     })
     .catch((err) => {
@@ -71,6 +73,5 @@ module.exports = function (program) {
   program
     .command('alias <cluster>')
     .description('Automatically updates existing aliases to point to the latest index')
-    .option('-I, --index <name>', 'The index name', 'content')
     .action(run)
 }
