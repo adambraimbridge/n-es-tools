@@ -26,6 +26,7 @@ const tools = [
   'repository',
   'restore',
   'snapshot',
+  'snapshot-download',
   'uuids'
 ];
 
