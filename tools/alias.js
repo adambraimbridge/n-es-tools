@@ -15,22 +15,31 @@ function fetchIndices () {
 }
 
 function extractCurrentIndex (aliases) {
-  return aliases[0].index
+  // check all aliases point at the same index
+  const unique = new Set(aliases.map((alias) => alias.index))
+
+  if (unique.size === 1) {
+    return unique.values().next().value
+  } else {
+    throw new Error(`Alias mismatch (${unique.size}), changes must be made manually`)
+  }
 }
 
 function extractLatestIndex (indices) {
   const PATTERN = /^content_\d{4}-\d{2}-\d{2}$/
   const DATE = /(\d{4}-\d{2}-\d{2})/
 
+  const toDate = (index) => new Date(index.match(DATE).pop())
+
   return indices
-        // pull out index names
-        .map((item) => item.index)
-        // ignore kibana etc.
-        .filter((index) => PATTERN.test(index))
-        // sort by date, oldest to newest
-        .sort((a, b) => new Date(a.match(DATE).pop()) - new Date(b.match(DATE).pop()))
-        // we have a winner!
-        .pop()
+    // pull out index names
+    .map((item) => item.index)
+    // ignore kibana etc.
+    .filter((index) => PATTERN.test(index))
+    // sort by date, oldest to newest
+    .sort((a, b) => toDate(a) - toDate(b))
+    // we have a winner!
+    .pop()
 }
 
 function updateAliases (aliases, indices) {
