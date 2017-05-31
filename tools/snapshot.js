@@ -59,7 +59,7 @@ function run (cluster, command) {
     .then(() => createSnapshot(opts))
     .then(() => pingStatus(opts))
     .then(() => {
-      console.log(`Snapshot "${opts.name}" created from ${cluster} cluster`)
+      console.log(`Snapshot "${opts.name}" created for "${opts.index}" from ${cluster} cluster`)
       process.exit()
     })
     .catch((err) => {
