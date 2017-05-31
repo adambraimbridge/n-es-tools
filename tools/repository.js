@@ -29,7 +29,7 @@ function run (cluster, command) {
   }
 
   if (!opts.bucketName) {
-    opts.bucketName = `nextcontent-${client.host.region}-backups`
+    opts.bucketName = `next-elasticsearch-${client.host.region}-backups`
   }
 
   return createRepository(opts)
