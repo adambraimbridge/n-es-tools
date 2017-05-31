@@ -5,7 +5,6 @@ const readFile = require('../lib/read-file')
 const orderlyQueue = require('../lib/orderly-queue')
 
 let status
-let failures
 
 function loadFile (filename) {
   const lines = []
@@ -20,7 +19,11 @@ function queue (uuids) {
 
   status.total = uuids.length
 
-  return orderlyQueue({ queue: uuids, callback: ingest, progress: tick })
+  return orderlyQueue({
+    queue: uuids,
+    callback: ingest,
+    progressCallback: tick
+  })
 }
 
 function ingest (uuid) {
@@ -44,11 +47,9 @@ function ingest (uuid) {
 function run (file) {
   status = progress('Ingesting content')
 
-  failures = []
-
   return loadFile(file)
     .then(queue)
-    .then(() => {
+    .then((failures) => {
       console.log('Ingest complete')
 
       if (failures.length) {
