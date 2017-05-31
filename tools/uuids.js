@@ -12,6 +12,7 @@ function fetchScan () {
   return client.search({
     index: options.index,
     type: 'item',
+    q: options.query,
     sort: [ '_doc' ],
     scroll: '1m',
     size: 5000,
@@ -70,5 +71,6 @@ module.exports = function (program) {
     .command('uuids <cluster>')
     .description('Downloads all content UUIDs')
     .option('-I, --index <name>', 'The index name', 'content')
+    .option('-Q, --query <querystring>', 'Simple query string query')
     .action(run)
 }
