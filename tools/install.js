@@ -85,7 +85,7 @@ function run ({ skipConfig }) {
       process.exit()
     })
     .catch((err) => {
-      console.error(`Install failed: ${err.toString()}`)
+      console.error(`Install failed: ${err.toString()}. Are you logged into Heroku?`)
       process.exit(1)
     })
 }
