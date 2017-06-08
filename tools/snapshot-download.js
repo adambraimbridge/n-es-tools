@@ -14,7 +14,7 @@ function fetchRepositories ({ repository }) {
 
 function fetchSnapshots ({ repository }) {
   return client.cat.snapshots({ format: 'json', repository })
-    .then((snapshots) => snapshots.length > 0)
+    .then((snapshots) => snapshots.some(({ status }) => status === 'SUCCESS'))
 }
 
 function fetchRepositorySettings ({ repository }) {
