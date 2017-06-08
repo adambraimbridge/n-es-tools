@@ -31,13 +31,13 @@ function createAwsClient () {
   })
 }
 
-function downloadDirectory (client, repo, target) {
+function downloadDirectory (client, settings, target) {
   return new Promise((resolve, reject) => {
     const download = client.downloadDir({
       localDir: target,
       s3Params: {
-        Bucket: repo.bucket,
-        Prefix: repo.base_path
+        Bucket: settings.bucket,
+        Prefix: settings.base_path
       }
     })
 
@@ -80,11 +80,11 @@ function run (cluster, command) {
         throw new Error(`No snapshots available in repository "${opts.repository}".`)
       }
     })
-    .then((repo) => {
+    .then((settings) => {
       const aws = createAwsClient()
       const target = path.join(process.cwd(), opts.directory)
 
-      return downloadDirectory(aws, repo, target)
+      return downloadDirectory(aws, settings, target)
     })
     .then(() => {
       console.log('Snapshot download complete')

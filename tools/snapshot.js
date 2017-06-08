@@ -33,7 +33,10 @@ function pingStatus ({ repository, name }) {
       status.total = stats.number_of_files
       status.curr = stats.processed_files
 
-      status.tick()
+      // don't draw a progress bar before we have any data
+      if (stats.number_of_files > 0) {
+        status.tick()
+      }
 
       if (state === 'SUCCESS' || state === 'DONE') {
         return
