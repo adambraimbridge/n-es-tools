@@ -7,7 +7,17 @@ const throttle = require('../lib/throttle')
 let client
 let status
 
-function fetchRepository ({ repository }) {
+function fetchRepositories ({ repository }) {
+  return client.cat.repositories({ format: 'json' })
+    .then((repositories) => repositories.some(({ id }) => id === repository))
+}
+
+function fetchSnapshots ({ repository }) {
+  return client.cat.snapshots({ format: 'json', repository })
+    .then((snapshots) => snapshots.some(({ status }) => status === 'SUCCESS'))
+}
+
+function fetchRepositorySettings ({ repository }) {
   return client.snapshot.getRepository({ repository })
     .then((response) => response[repository].settings)
 }
@@ -21,13 +31,13 @@ function createAwsClient () {
   })
 }
 
-function downloadDirectory (client, repo, target) {
+function downloadDirectory (client, settings, target) {
   return new Promise((resolve, reject) => {
     const download = client.downloadDir({
       localDir: target,
       s3Params: {
-        Bucket: repo.bucket,
-        Prefix: repo.base_path
+        Bucket: settings.bucket,
+        Prefix: settings.base_path
       }
     })
 
@@ -55,12 +65,26 @@ function run (cluster, command) {
 
   status = progress('Downloading snapshot')
 
-  return fetchRepository(opts)
-    .then((repo) => {
+  return fetchRepositories(opts)
+    .then((exists) => {
+      if (exists) {
+        return fetchSnapshots(opts)
+      } else {
+        throw new Error(`No repository named "${opts.repository}"`)
+      }
+    })
+    .then((exists) => {
+      if (exists) {
+        return fetchRepositorySettings(opts)
+      } else {
+        throw new Error(`No snapshots available in repository "${opts.repository}".`)
+      }
+    })
+    .then((settings) => {
       const aws = createAwsClient()
       const target = path.join(process.cwd(), opts.directory)
 
-      return downloadDirectory(aws, repo, target)
+      return downloadDirectory(aws, settings, target)
     })
     .then(() => {
       console.log('Snapshot download complete')
