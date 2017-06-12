@@ -1,4 +1,5 @@
 const s3 = require('s3')
+const os = require('os')
 const path = require('path')
 const elastic = require('../lib/elastic')
 const progress = require('../lib/progress')
@@ -31,6 +32,18 @@ function createAwsClient () {
   })
 }
 
+function resolveDirectory (dir) {
+  if (path.isAbsolute(dir)) {
+    return dir
+  }
+
+  if (/^~\//.test(dir)) {
+    return path.join(os.homedir(), dir)
+  }
+
+  return path.join(process.cwd(), dir)
+}
+
 function downloadDirectory (client, settings, target) {
   return new Promise((resolve, reject) => {
     const download = client.downloadDir({
@@ -60,6 +73,7 @@ function downloadDirectory (client, settings, target) {
 
 function run (cluster, command) {
   const opts = command.opts()
+  const target = resolveDirectory(opts.directory)
 
   client = elastic(cluster)
 
@@ -82,12 +96,10 @@ function run (cluster, command) {
     })
     .then((settings) => {
       const aws = createAwsClient()
-      const target = path.join(process.cwd(), opts.directory)
-
       return downloadDirectory(aws, settings, target)
     })
     .then(() => {
-      console.log('Snapshot download complete')
+      console.log(`Snapshot download completed: ${target}`)
       process.exit()
     })
     .catch((err) => {
