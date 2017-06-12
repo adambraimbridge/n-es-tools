@@ -38,7 +38,7 @@ function resolveDirectory (dir) {
   }
 
   if (/^~\//.test(dir)) {
-    return path.join(os.homedir(), dir)
+    return path.join(os.homedir(), dir.replace('~/', ''))
   }
 
   return path.join(process.cwd(), dir)
