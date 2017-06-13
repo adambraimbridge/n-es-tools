@@ -1,13 +1,14 @@
 const path = require('path')
 const fetch = require('node-fetch')
 const readFile = require('../lib/read-file')
+const resolvePath = require('../lib/resolve-path')
 
 let options
 let uniqueA
 let uniqueB
 
 function loadFile (filename, callback) {
-  const filepath = path.join(process.cwd(), filename)
+  const filepath = resolvePath(filename)
   return readFile(filepath, callback)
 }
 
