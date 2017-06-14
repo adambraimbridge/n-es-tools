@@ -1,9 +1,8 @@
 const s3 = require('s3')
-const os = require('os')
-const path = require('path')
 const elastic = require('../lib/elastic')
 const progress = require('../lib/progress')
 const throttle = require('../lib/throttle')
+const resolvePath = require('../lib/resolve-path')
 
 let client
 let status
@@ -30,18 +29,6 @@ function createAwsClient () {
       secretAccessKey: global.workspace.auth.secret_key
     }
   })
-}
-
-function resolveDirectory (dir) {
-  if (path.isAbsolute(dir)) {
-    return dir
-  }
-
-  if (/^~\//.test(dir)) {
-    return path.join(os.homedir(), dir.replace('~/', ''))
-  }
-
-  return path.join(process.cwd(), dir)
 }
 
 function downloadDirectory (client, settings, target) {
@@ -73,7 +60,7 @@ function downloadDirectory (client, settings, target) {
 
 function run (cluster, command) {
   const opts = command.opts()
-  const target = resolveDirectory(opts.directory)
+  const target = resolvePath(opts.directory)
 
   client = elastic(cluster)
 

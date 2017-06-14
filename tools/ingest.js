@@ -1,17 +1,16 @@
-const path = require('path')
 const request = require('../lib/request')
 const progress = require('../lib/progress')
 const readFile = require('../lib/read-file')
+const resolvePath = require('../lib/resolve-path')
 const orderlyQueue = require('../lib/orderly-queue')
 
 let status
 
 function loadFile (filename) {
   const lines = []
-  const callback = (line) => lines.push(line)
-  const filepath = path.join(process.cwd(), filename)
+  const filepath = resolvePath(filename)
 
-  return readFile(filepath, callback).then(() => lines)
+  return readFile(filepath, lines.push.bind(lines)).then(() => lines)
 }
 
 function queue (uuids) {
