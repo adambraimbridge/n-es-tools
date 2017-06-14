@@ -61,6 +61,12 @@ function run (cluster, command) {
     .then(fetchScan)
     .then(fetchScroll)
     .then(() => {
+      // ensure we finish writing before exiting
+      return new Promise((resolve) => {
+        output.on('finish', resolve)
+      })
+    })
+    .then(() => {
       console.log(`UUIDs saved to ${filepath}`)
       process.exit()
     })
