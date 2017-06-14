@@ -1,7 +1,8 @@
 const fs = require('fs')
-const path = require('path')
 const elastic = require('../lib/elastic')
 const progress = require('../lib/progress')
+const template = require('../lib/template')
+const resolvePath = require('../lib/resolve-path')
 
 let client
 let status
@@ -46,18 +47,21 @@ function fetchScroll (scrollId) {
 }
 
 function run (cluster, command) {
-  const filename = path.join(process.cwd(), `uuids-${cluster}.txt`)
-
   client = elastic(cluster)
   status = progress('Downloading UUIDs')
-  output = fs.createWriteStream(filename)
   options = command.opts()
+
+  // allow templating in filename to interpolate options ✌️
+  const filename = template(options.filename, Object.assign({}, options, { cluster }))
+  const filepath = resolvePath(filename)
+
+  output = fs.createWriteStream(filepath)
 
   return Promise.resolve()
     .then(fetchScan)
     .then(fetchScroll)
     .then(() => {
-      console.log(`UUIDs saved to ${filename}`)
+      console.log(`UUIDs saved to ${filepath}`)
       process.exit()
     })
     .catch((err) => {
@@ -72,5 +76,6 @@ module.exports = function (program) {
     .description('Downloads all content UUIDs')
     .option('-I, --index <name>', 'The index name', 'content')
     .option('-Q, --query <querystring>', 'Simple query string query')
+    .option('-F, --filename <filename>', 'Output filename', 'uuids-{{cluster}}.txt')
     .action(run)
 }
