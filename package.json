@@ -19,7 +19,15 @@
     "n-es-tools": "bin/tools"
   },
   "devDependencies": {
+    "@financial-times/secret-squirrel": "^2.5.0-beta.1",
     "npm-prepublish": "^1.2.2",
     "standard": "^8.5.0"
+  },
+  "config": {
+    "pre-git": {
+      "pre-commit": [
+        "node_modules/.bin/secret-squirrel"
+      ]
+    }
   }
 }
