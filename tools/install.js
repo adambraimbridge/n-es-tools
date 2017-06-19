@@ -4,7 +4,6 @@ const fs = require('fs')
 const mkdirp = require('mkdirp')
 const os = require('os')
 const path = require('path')
-const shell = require('../lib/shell')
 const template = require('../lib/template')
 
 function createDirectory () {
@@ -31,10 +30,6 @@ function writeTemplate (data) {
       err ? reject(err) : resolve()
     })
   })
-}
-
-function fetchHerokuStatus () {
-  return shell('heroku', [ 'whoami' ])
 }
 
 function fetchVaultToken () {
@@ -68,7 +63,6 @@ function run ({ skipConfig }) {
 
   return Promise.resolve()
     .then(createDirectory)
-    .then(skipConfig ? noop : fetchHerokuStatus)
     .then(skipConfig ? noop : fetchVaultToken)
     .then(skipConfig ? noop : fetchConfigVars)
     .then(createConfigFile)
@@ -77,7 +71,7 @@ function run ({ skipConfig }) {
       process.exit()
     })
     .catch((err) => {
-      console.error(`Install failed: ${err.toString()}. Are you logged into Heroku and Vault?`)
+      console.error(`Install failed: ${err.toString()}. Are you logged into Vault?`)
       process.exit(1)
     })
 }
