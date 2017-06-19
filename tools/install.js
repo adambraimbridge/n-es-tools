@@ -1,10 +1,11 @@
-const fs = require('fs')
-const path = require('path')
-const mkdirp = require('mkdirp')
+const configPath = require('../lib/config-path')
 const fetch = require('node-fetch')
+const fs = require('fs')
+const mkdirp = require('mkdirp')
+const os = require('os')
+const path = require('path')
 const shell = require('../lib/shell')
 const template = require('../lib/template')
-const configPath = require('../lib/config-path')
 
 const UUID = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/
 
@@ -38,28 +39,21 @@ function fetchHerokuStatus () {
   return shell('heroku', [ 'whoami' ])
 }
 
-function fetchHerokuAuth () {
-  return shell('heroku', [ 'config:get', 'APIKEY', '--app', 'ft-next-config-vars' ])
-    .then((output) => {
-      if (UUID.test(output)) {
-        return Promise.resolve(output)
-      } else {
-        return Promise.reject(output)
-      }
-    })
+function fetchVaultToken () {
+  return Promise.resolve(fs.readFileSync(path.join(os.homedir(), '.vault-token'), { encoding: 'utf8' }))
 }
 
-function fetchConfigVars (key) {
-  const url = 'https://ft-next-config-vars.herokuapp.com/development/n-es-tools'
+function fetchConfigVars (token) {
+  const url = 'https://vault.in.ft.com/v1/secret/teams/next/n-es-tools/development'
 
   return fetch(url, {
-    headers: { Authorization: key }
+    headers: { 'X-Vault-Token': token }
   })
     .then((res) => {
       if (res.ok) {
-        return res.json()
+        return res.json().then(json => json.data)
       } else {
-        throw new Error(`Config vars returned a ${res.status}`)
+        throw new Error(`Vault returned a ${res.status}`)
       }
     })
 }
@@ -77,7 +71,7 @@ function run ({ skipConfig }) {
   return Promise.resolve()
     .then(createDirectory)
     .then(skipConfig ? noop : fetchHerokuStatus)
-    .then(skipConfig ? noop : fetchHerokuAuth)
+    .then(skipConfig ? noop : fetchVaultToken)
     .then(skipConfig ? noop : fetchConfigVars)
     .then(createConfigFile)
     .then(() => {
@@ -85,7 +79,7 @@ function run ({ skipConfig }) {
       process.exit()
     })
     .catch((err) => {
-      console.error(`Install failed: ${err.toString()}. Are you logged into Heroku?`)
+      console.error(`Install failed: ${err.toString()}. Are you logged into Heroku and Vault?`)
       process.exit(1)
     })
 }
