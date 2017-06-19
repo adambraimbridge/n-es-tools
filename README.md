@@ -5,7 +5,7 @@ A useful CLI for working with Next's Elasticsearch clusters. Includes tools to s
 ## Prerequisites
 
 - Node 6+
-- [Heroku Command Line Tools][heroku-cli] (optional, see notes below)
+- [Vault CLI](https://github.com/Financial-Times/vault/wiki/Getting-Started#login-with-the-cli) (optional, see notes below)
 
 ## Installation and setup
 
@@ -17,7 +17,7 @@ $ npm i -g @financial-times/n-es-tools
 
 This will create a new folder in your home directory containing a single `config.yml` file. The tool requires several configuration settings which _must to be added to this file_ in order to use it.
 
-**Note:** By default the tool assumes that you have the [Heroku CLI][heroku-cli] installed and are logged in. It will attempt to download and apply the required configuration settings automatically. This may be skipped using the `--skip-config` flag when running install manually.
+**Note:** By default the tool assumes that you have the [Vault CLI](https://github.com/Financial-Times/vault/wiki/Getting-Started#login-with-the-cli) installed and are logged in. It will attempt to download and apply the required configuration settings automatically. This may be skipped using the `--skip-config` flag when running install manually.
 
 ## Usage
 
@@ -54,9 +54,7 @@ $ n-es-tools diff uuids-eu.txt uuids-us.txt
 
 ## Development
 
-Here's the policy attached to the `next-es-tools` user that this tool authenticates as via [next-config-vars][next-config-vars].
-
-[next-config-vars]: https://github.com/Financial-Times/next-config-vars/search?utf8=%E2%9C%93&q=n-es-tools+filename%3Adevelopment.js&type=Code
+Here's the policy attached to the `next-es-tools` user that this tool authenticates as.
 
 ### AWS IAM User
 
@@ -259,5 +257,3 @@ Here's the policy attached to the `next-es-tools` user that this tool authentica
     ]
 }
 ```
-
-[heroku-cli]: https://devcenter.heroku.com/articles/heroku-command-line
