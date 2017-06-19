@@ -7,8 +7,6 @@ const path = require('path')
 const shell = require('../lib/shell')
 const template = require('../lib/template')
 
-const UUID = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/
-
 function createDirectory () {
   return new Promise((resolve, reject) => {
     mkdirp(path.dirname(configPath), (err) => {
