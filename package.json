@@ -13,21 +13,15 @@
     "s3": "^4.4.0"
   },
   "scripts": {
-    "postinstall": "node bin/tools install"
+    "postinstall": "node bin/tools install",
+    "precommit": "node_modules/.bin/secret-squirrel"
   },
   "bin": {
     "n-es-tools": "bin/tools"
   },
   "devDependencies": {
-    "@financial-times/secret-squirrel": "^2.5.0-beta.1",
+    "@financial-times/n-gage": "^1.8.4",
     "npm-prepublish": "^1.2.2",
     "standard": "^8.5.0"
-  },
-  "config": {
-    "pre-git": {
-      "pre-commit": [
-        "node_modules/.bin/secret-squirrel"
-      ]
-    }
   }
 }
