@@ -25,7 +25,7 @@ function handleB (line) {
 }
 
 function testCAPI (uuid) {
-  return fetch(`https://api.ft.com/enrichedcontent/${uuid}`, {
+  return fetch(`https://api.ft.com/internalcontent/${uuid}`, {
     headers: {
       'X-Api-Key': global.workspace.keys.capi,
       'X-Policy': 'INCLUDE_RICH_CONTENT, INCLUDE_COMMENTS, INTERNAL_UNSTABLE, INCLUDE_PROVENANCE'
