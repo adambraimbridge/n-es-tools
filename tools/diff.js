@@ -25,43 +25,23 @@ function handleB (line) {
 }
 
 function testCAPI (uuid) {
-  return Promise.all([
-    fetchCapiV1(uuid),
-    fetchCapiV2(uuid)
-  ])
-    .then(([ res1, res2 ]) => {
-      const status1 = res1.status
-      const status2 = res2.status
-
-      if (status1 === 404 && status2 === 404) {
-        return { type: 'delete', uuid }
-      }
-
-      if (status1 === 200 || status2 === 200) {
-        return { type: 'ingest', uuid }
-      }
-
-      return { type: 'inconclusive', uuid }
-    })
-}
-
-function fetchCapiV1 (uuid) {
-  return fetch(`https://api.ft.com/content/items/v1/${uuid}`, {
-    headers: {
-      'X-Api-Key': global.workspace.keys.capi,
-      // allow access to wires
-      'X-FT-API-Content-Control-Policy': 'FT_B2C_FT_COM_CONTENT_POLICY_2013'
-    }
-  })
-}
-
-function fetchCapiV2 (uuid) {
   return fetch(`https://api.ft.com/enrichedcontent/${uuid}`, {
     headers: {
       'X-Api-Key': global.workspace.keys.capi,
       'X-Policy': 'INCLUDE_RICH_CONTENT, INCLUDE_COMMENTS, INTERNAL_UNSTABLE, INCLUDE_PROVENANCE'
     }
   })
+    .then((response) => {
+      if (response.status === 404) {
+        return { type: 'delete', uuid }
+      }
+
+      if (response.status === 200) {
+        return { type: 'ingest', uuid }
+      }
+
+      return { type: 'inconclusive', uuid }
+    })
 }
 
 function logAction ({ type, uuid }) {
