@@ -20,9 +20,13 @@ function restoreSnapshot ({ repository, snapshot, index }) {
       include_aliases: false
     }
   })
-    .then((response) => {
-      if (!response.accepted) {
-        throw new Error('Nothing to restore')
+    .then(({ accepted, snapshot }) => {
+      if (!accepted) {
+        if (!snapshot.indices.length) {
+          return Promise.reject(new Error(`No index named "${index}" found`))
+        }
+
+        return Promise.reject(new Error('Nothing to restore'))
       }
     })
 }
@@ -30,21 +34,27 @@ function restoreSnapshot ({ repository, snapshot, index }) {
 function pingStatus ({ snapshot, index }) {
   return client.indices.recovery({ index })
     .then((response) => {
-      // we'll just take the status of the primary shard for simplicity
-      const stats = response[index].shards.find((item) => item.source.snapshot === snapshot)
+      if (response.hasOwnProperty(index)) {
+        const stats = response[index].shards.filter((item) => (
+          item.type === 'SNAPSHOT' && item.source.snapshot === snapshot
+        ))
 
-      if (stats) {
-        status.total = stats.index.files.total
-        status.curr = stats.index.files.recovered
+        status.total = stats.reduce((count, item) => count + item.index.files.total, 0)
+        status.curr = stats.reduce((count, item) => count + item.index.files.recovered, 0)
 
-        status.tick()
-
-        if (stats.stage === 'DONE') {
-          return
+        if (status.total > 0 && status.curr <= status.total) {
+          status.tick()
         }
-      }
 
-      return wait(10000).then(() => pingStatus({ snapshot, index }))
+        if (stats.every(({ stage }) => stage === 'DONE')) {
+          return
+        } else {
+          return wait(10000).then(() => pingStatus({ snapshot, index }))
+        }
+      } else {
+        console.log(`Waiting for restore of "${snapshot}" to start`)
+        return wait(3000).then(() => pingStatus({ snapshot, index }))
+      }
     })
 }
 
@@ -59,7 +69,7 @@ function run (cluster, command) {
     .then(() => restoreSnapshot(opts))
     .then(() => pingStatus(opts))
     .then(() => {
-      console.log(`Restored snapshot "${opts.snapshot}" to ${cluster} cluster`)
+      console.log(`Restored "${opts.snapshot}" snapshot of "${opts.index}" index to ${cluster} cluster`)
       process.exit()
     })
     .catch((err) => {
