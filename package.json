@@ -2,6 +2,7 @@
   "name": "@financial-times/n-es-tools",
   "version": "0.0.0",
   "dependencies": {
+    "aws-sdk": "^2.124.0",
     "commander": "^2.11.0",
     "elasticsearch": "^13.3.1",
     "http-aws-es": "^3.1.0",
