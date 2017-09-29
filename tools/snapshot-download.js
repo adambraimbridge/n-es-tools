@@ -49,7 +49,7 @@ function downloadDirectory (client, settings, target) {
       status.curr = Math.ceil(download.progressAmount / 1000000)
 
       // don't draw a progress bar before we have any data
-      if (download.progressTotal) {
+      if (download.progressTotal && status.curr <= status.total) {
         status.tick()
       }
     }))
