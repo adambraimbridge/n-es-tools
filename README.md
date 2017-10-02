@@ -34,11 +34,11 @@ $ n-es-tools --help
 $ n-es-tools repository eu
 $ n-es-tools repository us
 
-# create a snapshot of the source index
+# create a snapshot of the source index (use actual name or alias)
 $ n-es-tools snapshot eu --index content
 
-# restore index to the target cluster
-$ n-es-tools restore us --index content
+# restore index to the target cluster (use actual name, not an alias)
+$ n-es-tools restore us --index content_2017-09-27
 ```
 
 ### Finding synchronisation problems

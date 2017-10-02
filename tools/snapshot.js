@@ -33,8 +33,9 @@ function pingStatus ({ repository, name }) {
       status.total = stats.number_of_files
       status.curr = stats.processed_files
 
-      // don't draw a progress bar before we have any data
-      if (stats.number_of_files > 0) {
+      // Don't draw a progress bar before we have any data
+      // and don't draw one when AWS gets carried away.
+      if (status.total > 0 && status.curr <= status.total) {
         status.tick()
       }
 
@@ -62,7 +63,7 @@ function run (cluster, command) {
     .then(() => createSnapshot(opts))
     .then(() => pingStatus(opts))
     .then(() => {
-      console.log(`Snapshot "${opts.name}" created for "${opts.index}" from ${cluster} cluster`)
+      console.log(`Snapshot "${opts.name}" created for "${opts.index}" index from ${cluster} cluster`)
       process.exit()
     })
     .catch((err) => {

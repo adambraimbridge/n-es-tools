@@ -1,4 +1,5 @@
 const s3 = require('s3')
+const AWS = require('../lib/aws')
 const elastic = require('../lib/elastic')
 const progress = require('../lib/progress')
 const throttle = require('../lib/throttle')
@@ -23,12 +24,8 @@ function fetchRepositorySettings ({ repository }) {
 }
 
 function createAwsClient () {
-  return s3.createClient({
-    s3Options: {
-      accessKeyId: global.workspace.auth.access_key,
-      secretAccessKey: global.workspace.auth.secret_key
-    }
-  })
+  const s3Client = new AWS.S3()
+  return s3.createClient({ s3Client })
 }
 
 function downloadDirectory (client, settings, target) {
@@ -49,7 +46,7 @@ function downloadDirectory (client, settings, target) {
       status.curr = Math.ceil(download.progressAmount / 1000000)
 
       // don't draw a progress bar before we have any data
-      if (download.progressTotal) {
+      if (download.progressTotal && status.curr <= status.total) {
         status.tick()
       }
     }))
