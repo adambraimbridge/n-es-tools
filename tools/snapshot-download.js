@@ -1,9 +1,10 @@
 const s3 = require('s3')
-const AWS = require('../lib/aws')
+const AWS = require('aws-sdk')
 const elastic = require('../lib/elastic')
 const progress = require('../lib/progress')
 const throttle = require('../lib/throttle')
 const resolvePath = require('../lib/resolve-path')
+const credentials = require('../lib/aws-credentials')
 
 let client
 let status
@@ -24,7 +25,7 @@ function fetchRepositorySettings ({ repository }) {
 }
 
 function createAwsClient () {
-  const s3Client = new AWS.S3()
+  const s3Client = new AWS.S3({ credentials })
   return s3.createClient({ s3Client })
 }
 
