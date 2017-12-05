@@ -32,7 +32,7 @@ function pingStatus (taskId) {
     .then((result) => {
       if (result.completed) {
         status.total = result.task.status.total
-        status.curr = sresult.task.status.created
+        status.curr = result.task.status.created
 
         status.tick()
 
@@ -58,7 +58,10 @@ function run (cluster, command) {
   return Promise.resolve()
     .then(() => verifyIndices(opts))
     .then(() => startReindex(opts))
-    .then(({ taskId }) => pingStatus(taskId))
+    .then(({ taskId }) => {
+      console.log(`Reindex started with task ID ${taskId}`)
+      return pingStatus(taskId)
+    })
     .then(() => {
       console.log(`Reindex from ${opts.source} to ${opts.destination} complete`)
       process.exit()
