@@ -1,6 +1,7 @@
 const progress = require('../lib/progress')
 const elastic = require('../lib/elastic')
 const wait = require('../lib/wait')
+const beep = require('beepbeep')
 
 let client
 let status
@@ -69,6 +70,9 @@ function run (cluster, command) {
     .catch((err) => {
       console.error(`Reindex failed: ${err.toString()}`)
       process.exit(1)
+    })
+    .then(() => {
+      beep(2)
     })
 }
 

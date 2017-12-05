@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "aws-sdk": "^2.124.0",
+    "beepbeep": "^1.2.1",
     "commander": "^2.11.0",
     "elasticsearch": "^13.3.1",
     "http-aws-es": "^3.1.0",
@@ -15,7 +16,9 @@
   },
   "scripts": {
     "postinstall": "node bin/tools install",
-    "precommit": "node_modules/.bin/secret-squirrel"
+    "precommit": "node_modules/.bin/secret-squirrel",
+    "commitmsg": "node_modules/.bin/secret-squirrel-commitmsg",
+    "prepush": "make verify -j3"
   },
   "bin": {
     "n-es-tools": "bin/tools"
