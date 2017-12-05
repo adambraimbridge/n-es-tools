@@ -23,6 +23,7 @@ const tools = [
   'diff',
   'ingest',
   'install',
+  'reindex',
   'repository',
   'restore',
   'snapshot',

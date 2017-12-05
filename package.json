@@ -15,7 +15,9 @@
   },
   "scripts": {
     "postinstall": "node bin/tools install",
-    "precommit": "node_modules/.bin/secret-squirrel"
+    "precommit": "node_modules/.bin/secret-squirrel",
+    "commitmsg": "node_modules/.bin/secret-squirrel-commitmsg",
+    "prepush": "make verify -j3"
   },
   "bin": {
     "n-es-tools": "bin/tools"
