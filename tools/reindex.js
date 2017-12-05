@@ -60,14 +60,6 @@ function pingStatus (taskId) {
         }
       }
 
-      if (result.errors) {
-        status.terminate()
-
-        return Promise.reject(
-          new Error(result.errors.join(', '))
-        )
-      }
-
       return wait(10000).then(() => pingStatus(taskId))
     })
 }
