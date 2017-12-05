@@ -1,7 +1,6 @@
 const progress = require('../lib/progress')
 const elastic = require('../lib/elastic')
 const wait = require('../lib/wait')
-const beep = require('beepbeep')
 
 let client
 let status
@@ -79,7 +78,6 @@ function run (cluster, command) {
     })
     .then(() => {
       console.log(`Reindex from ${opts.source} to ${opts.dest} complete`)
-      beep(2)
       process.exit()
     })
     .catch((err) => {
