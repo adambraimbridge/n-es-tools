@@ -14,7 +14,8 @@ function loadFile (filename) {
 }
 
 function queue (uuids) {
-  const sema = new Sema(2, { capacity: uuids.length });
+  // a simple semaphore pattern to rate-limit ingestion
+  const sema = new Sema(2, { capacity: uuids.length })
 
   status.total = uuids.length
 

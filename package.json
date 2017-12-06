@@ -11,7 +11,6 @@
     "mkdirp": "^0.5.1",
     "node-fetch": "^1.7.3",
     "progress": "^2.0.0",
-    "promise-parallel-throttle": "^3.0.0",
     "s3": "^4.4.0"
   },
   "scripts": {
