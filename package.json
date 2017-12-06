@@ -2,6 +2,7 @@
   "name": "@financial-times/n-es-tools",
   "version": "0.0.0",
   "dependencies": {
+    "async-sema": "^1.2.0",
     "aws-sdk": "^2.124.0",
     "commander": "^2.11.0",
     "elasticsearch": "^13.3.1",
@@ -10,7 +11,6 @@
     "mkdirp": "^0.5.1",
     "node-fetch": "^1.7.3",
     "progress": "^2.0.0",
-    "promise-parallel-throttle": "^3.0.0",
     "s3": "^4.4.0"
   },
   "scripts": {
@@ -26,5 +26,8 @@
     "@financial-times/n-gage": "^1.8.4",
     "npm-prepublish": "^1.2.2",
     "standard": "^8.5.0"
+  },
+  "engines": {
+    "node": ">=8.9.0"
   }
 }

@@ -1,8 +1,8 @@
+const Sema = require('async-sema')
 const request = require('../lib/request')
 const progress = require('../lib/progress')
 const readFile = require('../lib/read-file')
 const resolvePath = require('../lib/resolve-path')
-const orderlyQueue = require('../lib/orderly-queue')
 
 let status
 
@@ -14,15 +14,19 @@ function loadFile (filename) {
 }
 
 function queue (uuids) {
-  const tick = () => status.tick()
+  // a simple semaphore pattern to rate-limit ingestion
+  const sema = new Sema(2, { capacity: uuids.length })
 
   status.total = uuids.length
 
-  return orderlyQueue({
-    queue: uuids,
-    callback: ingest,
-    progressCallback: tick
-  })
+  return uuids.map((uuid) => (
+    sema.v()
+      .then(() => ingest(uuid))
+      .then(() => {
+        status.tick()
+        sema.p()
+      })
+  ))
 }
 
 function ingest (uuid) {
