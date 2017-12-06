@@ -26,5 +26,8 @@
     "@financial-times/n-gage": "^1.8.4",
     "npm-prepublish": "^1.2.2",
     "standard": "^8.5.0"
+  },
+  "engines": {
+    "node": ">=8.9.0"
   }
 }
