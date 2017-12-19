@@ -46,7 +46,7 @@ function pingStatus (taskId) {
       // Don't draw a progress bar before we have any data
       // and don't draw one when AWS gets carried away.
       if (status.total > 0 && status.curr <= status.total) {
-        status.tick()
+        status.tick(0)
       }
 
       if (result.completed) {

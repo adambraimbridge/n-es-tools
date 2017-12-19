@@ -48,7 +48,7 @@ function downloadDirectory (client, settings, target) {
 
       // don't draw a progress bar before we have any data
       if (download.progressTotal && status.curr <= status.total) {
-        status.tick()
+        status.tick(0)
       }
     }))
 
