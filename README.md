@@ -30,15 +30,21 @@ $ n-es-tools --help
 ### Snapshotting and restoring an index
 
 ```sh
-# set up a snapshot repository for both source and target clusters
-$ n-es-tools repository eu
-$ n-es-tools repository us
+# set up a snapshot repository for the source cluster
+$ n-es-tools repository eu -N transfers
+> Repository "transfers" created (using the bucket "next-elasticsearch-eu-west-1-backups") for eu cluster
 
-# create a snapshot of the source index (use actual name or alias)
-$ n-es-tools snapshot eu --index content
+# set up a snapshot repository on the target cluster using the same S3 bucket
+$ n-es-tools repository us -N transfers -B next-elasticsearch-eu-west-1-backups -R eu-west-1
+> Repository "transfers" created (using the bucket "next-elasticsearch-eu-west-1-backups") for us cluster
+
+# create a snapshot of the source index
+$ n-es-tools snapshot eu -R transfers
+> Snapshot "my-snapshot" created for "content_2017-12-04" index from eu cluster
 
 # restore index to the target cluster (use actual name, not an alias)
-$ n-es-tools restore us --index content_2017-09-27
+$ n-es-tools restore us -R transfers -I content_2017-12-04
+> Restored "my-snapshot" snapshot of "content_2017-12-04" index to us cluster
 ```
 
 ### Finding synchronisation problems
@@ -146,102 +152,6 @@ Here's the policy attached to the `next-es-tools` user that this tool authentica
             "Effect": "Allow",
             "Action": "iam:PassRole",
             "Resource": "arn:aws:iam::027104099916:role/FTApplicationRoleFor_nextcontent"
-        },
-        {
-            "Sid": "AllowKeyRotation",
-            "Effect": "Allow",
-            "Action": [
-                "iam:CreateAccessKey",
-                "iam:DeleteAccessKey",
-                "iam:ListAccessKeys",
-                "iam:UpdateAccessKey"
-            ],
-            "Resource": "arn:aws:iam:::user/${aws:username}"
-        }
-    ]
-}
-                "cloudformation:ValidateTemplate"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Sid": "AllowCloudFormationStackDeletion",
-            "Effect": "Allow",
-            "Action": [
-                "cloudformation:DeleteStack"
-            ],
-            "Resource": "arn:aws:cloudformation:::stack/next-content-*"
-        },
-        {
-            "Sid": "AllowCloudFormationStackManagement",
-            "Effect": "Allow",
-            "Action": [
-                "cloudformation:CancelUpdateStack",
-                "cloudformation:ContinueUpdateRollback",
-                "cloudformation:CreateChangeSet",
-                "cloudformation:ExecuteChangeSet",
-                "cloudformation:Get*",
-                "cloudformation:List*",
-                "cloudformation:PreviewStackUpdate",
-                "cloudformation:SetStackPolicy",
-                "cloudformation:SignalResource",
-                "cloudformation:UpdateStack"
-            ],
-            "Resource": [
-                "arn:aws:cloudformation:::stack/next-content-*",
-                "arn:aws:cloudformation:::stack/nextcontent/*"
-            ]
-        },
-        {
-            "Sid": "AllowNextContentElasticsearchDomainCreation",
-            "Effect": "Allow",
-            "Action": [
-                "es:CreateElasticsearchDomain",
-                "es:Describe*",
-                "es:List*"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Sid": "AllowNextContentElasticsearchDomainDeletion",
-            "Effect": "Allow",
-            "Action": [
-                "es:DeleteElasticsearchDomain"
-            ],
-            "Resource": "arn:aws:es:::domain/next-content-*"
-        },
-        {
-            "Sid": "AllowNextContentElasticsearchDomainManagement",
-            "Effect": "Allow",
-            "Action": [
-                "es:AddTags",
-                "es:RemoveTags",
-                "es:UpdateElasticsearchDomainConfig"
-            ],
-            "Resource": [
-                "arn:aws:es:::domain/next-content-*",
-                "arn:aws:es:::domain/nextcontent"
-            ]
-        },
-        {
-            "Sid": "AllowNextContentIAMUserPassRole",
-            "Effect": "Allow",
-            "Action": "iam:PassRole",
-            "Resource": "arn:aws:iam::027104099916:role/FTApplicationRoleFor_nextcontent"
-        },
-        {
-            "Sid": "AllowNextContentS3BucketAccess",
-            "Effect": "Allow",
-            "Action": [
-                "s3:DeleteObject",
-                "s3:GetBucketLocation",
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:GetObjectVersion",
-                "s3:DeleteObjectVersion",
-                "s3:PutObject"
-            ],
-            "Resource": "arn:aws:s3:::nextcontent-*"
         },
         {
             "Sid": "AllowKeyRotation",
