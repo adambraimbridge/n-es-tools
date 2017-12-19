@@ -43,7 +43,7 @@ function pingStatus ({ snapshot, index }) {
         status.curr = stats.reduce((count, item) => count + item.index.files.recovered, 0)
 
         if (status.total > 0 && status.curr <= status.total) {
-          status.tick()
+          status.tick(0)
         }
 
         if (stats.every(({ stage }) => stage === 'DONE')) {
