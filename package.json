@@ -4,6 +4,7 @@
   "dependencies": {
     "async-sema": "^1.2.0",
     "aws-sdk": "^2.124.0",
+    "chalk": "^2.3.0",
     "commander": "^2.11.0",
     "elasticsearch": "^13.3.1",
     "http-aws-es": "^3.1.0",
@@ -11,7 +12,9 @@
     "mkdirp": "^0.5.1",
     "node-fetch": "^1.7.3",
     "progress": "^2.0.0",
-    "s3": "^4.4.0"
+    "s3": "^4.4.0",
+    "unescape": "^1.0.1",
+    "word-wrap": "^1.2.3"
   },
   "scripts": {
     "postinstall": "node bin/tools install",

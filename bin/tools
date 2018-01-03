@@ -21,6 +21,7 @@ if (fs.existsSync(configPath)) {
 const tools = [
   'alias',
   'diff',
+  'get',
   'ingest',
   'install',
   'reindex',
