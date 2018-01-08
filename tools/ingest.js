@@ -1,7 +1,7 @@
 const Sema = require('async-sema')
 const progress = require('../lib/progress')
 const readFile = require('../lib/read-file')
-const ingest = require('../lib/request-ingest')
+const elasticItem = require('../lib/elastic-item')
 const resolvePath = require('../lib/resolve-path')
 
 let status
@@ -21,7 +21,7 @@ function queue (uuids) {
 
   return uuids.map((uuid) => (
     sema.v()
-      .then(() => ingest(uuid))
+      .then(() => elasticItem(uuid))
       .then(() => {
         status.tick()
         sema.p()

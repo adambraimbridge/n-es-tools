@@ -1,6 +1,8 @@
 const path = require('path')
+const chalk = require('chalk')
 const fetch = require('node-fetch')
 const readFile = require('../lib/read-file')
+const checkCAPI = require('../lib/check-capi')
 const resolvePath = require('../lib/resolve-path')
 
 let options
@@ -12,83 +14,70 @@ function loadFile (filename, callback) {
   return readFile(filepath, callback)
 }
 
-function handleA (line) {
-  uniqueA.add(line)
+async function processActions (uuids) {
+  const actions = await Promise.all(uuids.map(checkCAPI))
+
+  return actions.map((type, i) => {
+    const uuid = uuids[i]
+    return { uuid, type }
+  })
 }
 
-function handleB (line) {
-  if (uniqueA.has(line)) {
-    uniqueA.delete(line)
-  } else {
-    uniqueB.add(line)
+async function run (fileA, fileB) {
+  // Sets are extremely performant with a large # of entries
+  const unique = {
+    a: new Set(),
+    b: new Set()
   }
-}
 
-function testCAPI (uuid) {
-  return fetch(`https://api.ft.com/internalcontent/${uuid}`, {
-    headers: {
-      'X-Api-Key': global.workspace.keys.capi,
-      'X-Policy': 'INCLUDE_RICH_CONTENT, INCLUDE_COMMENTS, INTERNAL_UNSTABLE, INCLUDE_PROVENANCE'
+  const filenameA = path.basename(fileA)
+  const filenameB = path.basename(fileB)
+
+  // Load all UUIDs from each file...
+  await loadFile(fileA, (line) => {
+    unique.a.add(line)
+  })
+
+  // ... but only end up with the unique UUIDs
+  await loadFile(fileB, (line) => {
+    if (unique.a.has(line)) {
+      unique.a.delete(line)
+    } else {
+      unique.b.add(line)
     }
   })
-    .then((response) => {
-      if (response.status === 404) {
-        return { type: 'delete', uuid }
+
+  // For convenience process the unique UUIDs together
+  const targets = [ ...unique.a, ...unique.b ]
+
+  if (targets.length) {
+    console.log(`Found ${chalk.magenta(targets.length)} items requiring action`)
+
+    // Check each UUID against CAPI, to infer which action to take
+    const actions = await processActions(targets)
+
+    // Check each action against the original lists, to update the right cluster
+    return actions.map(({ uuid, type }) => {
+      let note
+
+      if (type === 'ingest') {
+        note = `not found in ${unique.a.has(uuid) ? filenameB : filenameA}`
       }
 
-      if (response.status === 200) {
-        return { type: 'ingest', uuid }
+      if (type === 'delete') {
+        note = `found in ${unique.a.has(uuid) ? filenameA : filenameB}`
       }
 
-      return { type: 'inconclusive', uuid }
+      console.log(`${chalk.bold(type)} ${chalk.cyan(uuid)} (${note})`)
     })
-}
-
-function logAction ({ type, uuid }) {
-  const filenameA = path.basename(options.fileA)
-  const filenameB = path.basename(options.fileB)
-
-  let advice = ''
-
-  if (type === 'ingest') {
-    advice = `(not found in ${uniqueA.has(uuid) ? filenameB : filenameA})`
+  } else {
+    console.log('No differences found')
   }
-
-  if (type === 'delete') {
-    advice = `(found in ${uniqueA.has(uuid) ? filenameA : filenameB})`
-  }
-
-  return `${type} ${uuid} ${advice}`
-}
-
-function run ([ fileA, fileB ], command) {
-  // Sets are extremely performant with a large # of entries
-  uniqueA = new Set()
-  uniqueB = new Set()
-
-  options = { fileA, fileB }
-
-  return Promise.resolve()
-    .then(() => loadFile(fileA, handleA))
-    .then(() => loadFile(fileB, handleB))
-    .then(() => {
-      const joined = [...uniqueA, ...uniqueB]
-      return Promise.all(joined.map(testCAPI))
-    })
-    .then((actions) => {
-      console.log(`Diff complete, ${actions.length} actions required`)
-      console.log(actions.map(logAction).join('\n'))
-      process.exit()
-    })
-    .catch((err) => {
-      console.error(`Diff failed: ${err.toString()}`)
-      process.exit(1)
-    })
 }
 
 module.exports = function (program) {
   program
-    .command('diff <files...>')
+    .command('diff <a> <b>')
     .description('Finds differences between two sets of UUIDs')
     .action(run)
 }
