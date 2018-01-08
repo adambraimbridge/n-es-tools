@@ -21,7 +21,12 @@ function queue (uuids) {
 
   return uuids.map((uuid) => (
     sema.v()
-      .then(() => elasticItem(uuid))
+      .then(() => (
+        Promise.all([
+          elasticItem(uuid).eu.ingest(),
+          elasticItem(uuid).us.ingest()
+        ])
+      ))
       .then(() => {
         status.tick()
         sema.p()
