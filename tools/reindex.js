@@ -50,7 +50,7 @@ function pingStatus (taskId) {
       }
 
       if (result.completed) {
-        if (result.failures.length) {
+        if (result.failures && result.failures.length) {
           return Promise.reject(
             new Error(`Task completed but with ${result.failures.length} failures`)
           )
