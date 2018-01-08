@@ -1,4 +1,3 @@
-const fs = require('fs')
 const chalk = require('chalk')
 const elastic = require('../lib/elastic')
 const checkCAPI = require('../lib/check-capi')
@@ -30,7 +29,7 @@ async function fetchIDs () {
     type: 'item',
     sort: SORT,
     q: QUERY,
-    size: 100,
+    size: SIZE,
     _source: false
   }
 

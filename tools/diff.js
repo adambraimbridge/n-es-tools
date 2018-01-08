@@ -1,13 +1,8 @@
 const path = require('path')
 const chalk = require('chalk')
-const fetch = require('node-fetch')
 const readFile = require('../lib/read-file')
 const checkCAPI = require('../lib/check-capi')
 const resolvePath = require('../lib/resolve-path')
-
-let options
-let uniqueA
-let uniqueB
 
 function loadFile (filename, callback) {
   const filepath = resolvePath(filename)
