@@ -1,7 +1,7 @@
 const Sema = require('async-sema')
-const request = require('../lib/request')
 const progress = require('../lib/progress')
 const readFile = require('../lib/read-file')
+const ingest = require('../lib/request-ingest')
 const resolvePath = require('../lib/resolve-path')
 
 let status
@@ -27,24 +27,6 @@ function queue (uuids) {
         sema.p()
       })
   ))
-}
-
-function ingest (uuid) {
-  const params = {
-    method: 'PUT',
-    timeout: 9000,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Api-Key': global.workspace.keys.es_interface
-    },
-    body: JSON.stringify({ id: uuid })
-  }
-
-  // this will double up overhead of modelling but it is simple
-  return Promise.all([
-    request('https://ft-next-es-interface-eu.herokuapp.com/api/item', params),
-    request('https://ft-next-es-interface-us.herokuapp.com/api/item', params)
-  ])
 }
 
 function run (file) {
