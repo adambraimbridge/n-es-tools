@@ -49,6 +49,14 @@ $ n-es-tools restore us -R transfers -I content_2017-12-04
 
 ### Finding synchronisation problems
 
+For issues caused by content published within the last 24 hours:
+
+```sh
+$ n-es-tools sync
+```
+
+For any issues caused by content published further back in time:
+
 ```sh
 # fetch all UUIDs from each index
 $ n-es-tools uuids eu
