@@ -13,7 +13,7 @@ function loadFile (filename) {
   return readFile(filepath, lines.push.bind(lines)).then(() => lines)
 }
 
-function queue (uuids) {
+function queue (uuids, cluster) {
   // a simple semaphore pattern to rate-limit ingestion
   const sema = new Sema(2, { capacity: uuids.length })
 
@@ -22,10 +22,7 @@ function queue (uuids) {
   return uuids.map((uuid) => (
     sema.v()
       .then(() => (
-        Promise.all([
-          elasticItem(uuid).eu.ingest(),
-          elasticItem(uuid).us.ingest()
-        ])
+        elasticItem(uuid)[cluster].ingest()
       ))
       .then(() => {
         status.tick()
@@ -34,19 +31,15 @@ function queue (uuids) {
   ))
 }
 
-function run (file) {
+function run (cluster, file) {
   status = progress('Ingesting content')
 
   return loadFile(file)
-    .then(queue)
-    .then((failures) => {
-      console.log('Ingest complete')
-
-      if (failures.length) {
-        console.warn(`However, there were ${failures.length} failures:`)
-        console.log(failures.join('\n'))
-      }
-
+    .then((uuids) => (
+      Promise.all(queue(uuids, cluster))
+    ))
+    .then((items) => {
+      console.log(`Ingest complete, ingested ${items.length} items to ${cluster} cluster`)
       process.exit()
     })
     .catch((err) => {
@@ -57,7 +50,7 @@ function run (file) {
 
 module.exports = function (program) {
   program
-    .command('ingest <file>')
+    .command('ingest <cluster> <file>')
     .description('Takes a set of content UUIDs and sends each for ingestion')
     .action(run)
 }
