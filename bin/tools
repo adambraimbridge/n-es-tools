@@ -20,6 +20,7 @@ if (fs.existsSync(configPath)) {
 // register all tools
 const tools = [
   'alias',
+  'concepts',
   'diff',
   'get',
   'ingest',
