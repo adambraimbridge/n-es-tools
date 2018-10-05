@@ -42,12 +42,32 @@ function extractLatestIndex (indices) {
     .pop()
 }
 
-function updateAliases (aliases, indices) {
+async function getDifference (current, latest) {
+  const [ a, b ] = await Promise.all([
+    client.count({ index: current }),
+    client.count({ index: latest })
+  ])
+
+  console.log(`Current index has ${a.count} documents`)
+  console.log(`Latest index has ${b.count} documents`)
+
+  return Math.abs(a.count - b.count)
+}
+
+async function updateAliases (aliases, indices) {
   const current = extractCurrentIndex(aliases)
   const latest = extractLatestIndex(indices)
 
   if (current === latest) {
     throw new Error(`Current index and latest index are the same (${latest})`)
+  }
+
+  const diff = await getDifference(current, latest)
+
+  // This is an arbitrary number, but the newly promoted index will be synced quickly with
+  // an index from another region if there are only a small number of differences.
+  if (diff > 10) {
+    throw new Error(`Current index and latest index are too out of sync (${diff} documents)`)
   }
 
   const actions = aliases.reduce((actions, { alias }) => {
@@ -63,19 +83,23 @@ function updateAliases (aliases, indices) {
   return client.indices.updateAliases({ body: { actions } })
 }
 
-function run (cluster, command) {
+async function run (cluster, command) {
   client = elastic(cluster)
 
-  return Promise.all([ fetchAliases(), fetchIndices() ])
-    .then(([ aliases, indices ]) => updateAliases(aliases, indices))
-    .then(() => {
-      console.log('Alias complete')
-      process.exit()
-    })
-    .catch((err) => {
-      console.error(`Alias failed: ${err.toString()}`)
-      process.exit(1)
-    })
+  try {
+    const [ aliases, indices ] = await Promise.all([
+      fetchAliases(),
+      fetchIndices()
+    ])
+
+    await updateAliases(aliases, indices)
+
+    console.log('Alias complete')
+    process.exit()
+  } catch (error) {
+    console.error(`Alias failed: ${error}`)
+    process.exit(1)
+  }
 }
 
 module.exports = function (program) {
