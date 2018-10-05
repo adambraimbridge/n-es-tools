@@ -4,7 +4,7 @@ A useful CLI for working with Next's Elasticsearch clusters. Includes tools to s
 
 ## Prerequisites
 
-- Node 6+
+- Node 8.11+
 - [Vault CLI](https://github.com/Financial-Times/vault/wiki/Getting-Started#login-with-the-cli) (optional, see notes below)
 
 ## Installation and setup
