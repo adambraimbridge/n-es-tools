@@ -7,7 +7,7 @@ const DOCTOR = 'http://ft-next-es-interface-eu.herokuapp.com/ui/content-doctor'
 
 const SORT = 'publishedDate:desc'
 
-const QUERY = 'publishedDate:>now-24h NOT type:podcast'
+const QUERY = 'publishedDate:>now-24h'
 
 const SIZE = 100
 
