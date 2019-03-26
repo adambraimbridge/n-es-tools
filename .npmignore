@@ -1,5 +1,7 @@
+.circleci/
 test/
-.circleci
-ft.yml
+.editorconfig
+CODEOWNERS
 Makefile
 secret-squirrel.js
+renovate.json

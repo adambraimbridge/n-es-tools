@@ -1,4 +1,4 @@
-const s3 = require('s3')
+const s3 = require('s3-client')
 const AWS = require('aws-sdk')
 const elastic = require('../lib/elastic')
 const progress = require('../lib/progress')
