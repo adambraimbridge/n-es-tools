@@ -45,7 +45,7 @@ function pingStatus ({ repository, name }) {
 
       if (state === 'FAILED') {
         status.terminate()
-        return Promise.reject('Snapshot failed')
+        throw Error('Snapshot failed')
       }
 
       return wait(10000).then(() => pingStatus({ repository, name }))

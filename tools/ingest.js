@@ -1,4 +1,4 @@
-const Sema = require('async-sema')
+const { Sema } = require('async-sema')
 const progress = require('../lib/progress')
 const readFile = require('../lib/read-file')
 const elasticItem = require('../lib/elastic-item')
@@ -15,18 +15,18 @@ function loadFile (filename) {
 
 function queue (uuids, cluster) {
   // a simple semaphore pattern to rate-limit ingestion
-  const sema = new Sema(2, { capacity: uuids.length })
+  const sema = new Sema(2)
 
   status.total = uuids.length
 
   return uuids.map((uuid) => (
-    sema.v()
+    sema.acquire()
       .then(() => (
         elasticItem(uuid)[cluster].ingest()
       ))
       .then(() => {
         status.tick()
-        sema.p()
+        sema.release()
       })
   ))
 }
