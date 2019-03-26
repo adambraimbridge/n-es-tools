@@ -23,10 +23,10 @@ function restoreSnapshot ({ repository, snapshot, index }) {
     .then(({ accepted, snapshot }) => {
       if (!accepted) {
         if (!snapshot.indices.length) {
-          return Promise.reject(new Error(`No index named "${index}" found`))
+          throw Error(`No index named "${index}" found`)
         }
 
-        return Promise.reject(new Error('Nothing to restore'))
+        throw Error('Nothing to restore')
       }
     })
 }
@@ -46,9 +46,7 @@ function pingStatus ({ snapshot, index }) {
           status.tick(0)
         }
 
-        if (stats.every(({ stage }) => stage === 'DONE')) {
-          return
-        } else {
+        if (!stats.every(({ stage }) => stage === 'DONE')) {
           return wait(10000).then(() => pingStatus({ snapshot, index }))
         }
       } else {

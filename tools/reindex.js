@@ -14,11 +14,11 @@ function verifyIndices ({ source, dest }) {
       const b = result.some(({ index }) => index === dest)
 
       if (a === false) {
-        return Promise.reject(`Could not find the index "${source}"`)
+        throw Error(`Could not find the index "${source}"`)
       }
 
       if (b === false) {
-        return Promise.reject(`Could not find the index "${dest}"`)
+        throw Error(`Could not find the index "${dest}"`)
       }
     })
 }
