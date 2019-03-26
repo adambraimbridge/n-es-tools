@@ -50,9 +50,11 @@ function pingStatus (taskId) {
       }
 
       if (result.completed) {
-        if (result.failures && result.failures.length) {
+        if (result.response.failures.length) {
+          const causes = result.response.failures.map((failure) => failure.cause)
+
           return Promise.reject(
-            new Error(`Task completed but with ${result.failures.length} failures`)
+            new Error(`Task completed but with failures... ${JSON.stringify(causes)}`)
           )
         } else {
           return result.response
