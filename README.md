@@ -35,7 +35,7 @@ $ n-es-tools repository eu -N transfers
 > Repository "transfers" created (using the bucket "next-elasticsearch-eu-west-1-backups") for eu cluster
 
 # set up a snapshot repository on the target cluster using the same S3 bucket
-$ n-es-tools repository us -N transfers -B next-elasticsearch-eu-west-1-backups -R eu-west-1
+$ n-es-tools repository us -N transfers -B next-elasticsearch-eu-west-1-backups
 > Repository "transfers" created (using the bucket "next-elasticsearch-eu-west-1-backups") for us cluster
 
 # create a snapshot of the source index
