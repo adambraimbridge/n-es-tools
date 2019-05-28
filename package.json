@@ -20,7 +20,8 @@
     "postinstall": "node bin/tools install",
     "precommit": "node_modules/.bin/secret-squirrel",
     "commitmsg": "node_modules/.bin/secret-squirrel-commitmsg",
-    "prepush": "make verify -j3"
+    "prepush": "make verify -j3",
+    "prepare": "npx snyk protect || npx snyk protect -d || true"
   },
   "bin": {
     "n-es-tools": "bin/tools"
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@financial-times/n-gage": "^3.4.2",
     "npm-prepublish": "^1.2.2",
+    "snyk": "^1.167.2",
     "standard": "^12.0.1"
   },
   "engines": {
