@@ -12,9 +12,7 @@
     "mkdirp": "^0.5.1",
     "node-fetch": "^2.3.0",
     "progress": "^2.0.0",
-    "s3-client": "^4.4.2",
-    "unescape": "^1.0.1",
-    "word-wrap": "^1.2.3"
+    "s3-client": "^4.4.2"
   },
   "scripts": {
     "postinstall": "node bin/tools install",
