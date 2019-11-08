@@ -175,3 +175,13 @@ Here's the policy attached to the `next-es-tools` user that this tool authentica
     ]
 }
 ```
+
+### Fixing authorisation issues
+
+Rotating AWS keys means that eventually the `access_key` stored at `~/.n-es-tools/config.yml` will become outdated, meaning that you will see something like the following message:
+
+```
+<TASK> failed: Authorization Exception :: {"path":"/content/item/_search","query":{"sort":"_doc","scroll":"1m","size":5000,"_source":"false"},"statusCode":403,"response":"{\"message\":\"The security token included in the request is invalid.\"}"}
+```
+
+Reinstalling `n-es-tools` will pull in the current `access_key` and should address this issue.
